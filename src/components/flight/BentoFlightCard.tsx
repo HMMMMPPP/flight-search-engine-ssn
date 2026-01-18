@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { AIRPORT_CODES } from '@/lib/data/airports';
 import { useSettings } from '@/context/SettingsContext';
 import { getFlightRecommendationType } from '@/lib/agents/strategist';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface BentoFlightCardProps {
     flight: Flight;
@@ -23,6 +23,7 @@ export function BentoFlightCard({ flight, index, dictionaries, onToggle, id, bat
     const [isExpanded, setIsExpanded] = useState(false);
     const isBestVibe = flight.vibe?.score ? flight.vibe.score > 8.5 : false;
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     // Helper for names
     const getLocationName = (code: string) => {
@@ -213,12 +214,11 @@ export function BentoFlightCard({ flight, index, dictionaries, onToggle, id, bat
                         if (onToggle) onToggle(true);
 
                         // Navigate to booking page with flight details
-                        const params = new URLSearchParams({
-                            origin: flight.departure.code,
-                            destination: flight.arrival.code,
-                            airline: airlineName,
-                            price: `${currency.symbol}${Number(flight.price).toFixed(2)}`,
-                        });
+                        const params = new URLSearchParams(searchParams.toString());
+                        params.set('origin', flight.departure.code);
+                        params.set('destination', flight.arrival.code);
+                        params.set('airline', airlineName);
+                        params.set('price', `${currency.symbol}${Number(flight.price).toFixed(2)}`);
 
                         router.push(`/booking?${params.toString()}`);
                     }}

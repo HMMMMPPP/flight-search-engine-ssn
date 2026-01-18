@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.0.2] - 2026-01-19
+
+### Fixed
+- Build failure for `/booking` page caused by SSG/SSR conflict
+- Booking page navigation state loss ("Back to Search" now preserves context)
+- "Return Home" from booking page not re-populating search form
+
+### Changed
+- Refactored `BookingPage` into Server Component with Suspense
+- Updated `SearchFormWrapper` to accept initial values from URL parameters
+- Improved `BentoFlightCard` to forward flight and search details to booking
+
 ## [1.0.1] - 2026-01-19
 
 ### Added

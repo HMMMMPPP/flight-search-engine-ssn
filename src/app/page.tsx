@@ -4,7 +4,23 @@ import { TrendStrategist } from '@/components/analytics/TrendStrategist';
 // Force dynamic if we want real-time random inspiration, or cache it
 export const revalidate = 3600; // Cache for 1 hour
 
-export default async function LandingPage() {
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function LandingPage(props: Props) {
+  const searchParams = await props.searchParams;
+
+  // Normalize searchParams to expected shape for initialValues
+  const initialValues = {
+    origin: searchParams.origin as string,
+    destination: searchParams.destination as string,
+    date: searchParams.date as string,
+    returnDate: searchParams.returnDate as string,
+    pax: searchParams.pax as string,
+    cabinClass: searchParams.cabinClass as string,
+  };
+
   // LANDING PAGE IS NOW CLEAN - No pre-fetched dashboard data
 
   return (
@@ -29,8 +45,7 @@ export default async function LandingPage() {
           </div>
 
           {/* Search Form pushes to /search */}
-          {/* Search Form pushes to /search */}
-          <SearchFormWrapper isOnLandingPage={true} />
+          <SearchFormWrapper isOnLandingPage={true} initialValues={initialValues} />
 
           {/* AI Trend Strategist (Mocked Demo) */}
           <TrendStrategist />

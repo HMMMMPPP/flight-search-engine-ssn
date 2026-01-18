@@ -45,7 +45,16 @@ Established a domain-driven structure to ensure scalability:
     *   Clear display of Airline, Departure/Arrival times, Duration.
     *   **Smart Stops**: Explicit visualization of stops (e.g., "1 Stop (IST)") and layovers.
     *   **Price**: Prominent, distinct pricing display.
+    *   **Price**: Prominent, distinct pricing display.
     *   **Actions**: "Select" button for booking flow.
+
+### 2.5 Booking Flow (Beta)
+**Objective**: Provide a placeholder booking experience and capture search intent.
+*   **Booking Page**: `src/app/booking/page.tsx`
+    *   **Architecture**: Server Component shell with Suspense for optimal loading.
+    *   **Client Logic**: `BookingClient.tsx` manages URL parameters (`useSearchParams`).
+    *   **Navigation State**: Preserves search context ("Back to Search" uses history, "Return Home" rebuilds query).
+    *   **Status**: "Coming Soon" with timeline, pre-filled with selected flight details.
 
 ### 3. Advanced Filtering
 **Objective**: Empower users to refine results instantly.
