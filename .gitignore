@@ -1,0 +1,123 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Next.js
+/.next/
+/out/
+.next
+
+# Production
+/build
+dist
+
+# Environment Variables (CRITICAL - Never commit these!)
+.env
+.env*.local
+.env.local
+.env.production
+.env.development
+.env.test
+
+# Sentry Configuration (Contains Auth Tokens!)
+.env.sentry-build-plugin
+.sentryclirc
+sentry.properties
+
+# API Keys & Credentials (Extra Protection)
+*.key
+*.pem
+*.p12
+*.pfx
+*.cer
+*.crt
+*.der
+*.cert
+secrets/
+credentials/
+config/local.*
+*.credentials
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vscode-test
+.history/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Testing
+/coverage
+.nyc_output
+*.test.js.snap
+
+# Misc
+*.log
+.vercel
+.netlify
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary & Backup Files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~.nib
+*.backup
+.cache/
+
+# Database Files (if any local DBs are used)
+*.sqlite
+*.sqlite3
+*.db
+
+# Archives & Compressed Files (potentially sensitive)
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Local Scripts (that might contain secrets)
+scripts/local-*
+scripts/dev-*
+local-*.sh
+dev-*.sh
+
+# Debugging & Profiling
+.trace
+.prof
+*.cpuprofile
+*.heapprofile
+*.heapsnapshot
+
+# Docker (if you add containerization later)
+.dockerignore
+docker-compose.override.yml
