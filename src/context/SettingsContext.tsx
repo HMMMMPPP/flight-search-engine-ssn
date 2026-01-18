@@ -34,7 +34,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     // Initialize with defaults, update from localStorage on mount
     const [currency, setCurrencyState] = useState<Currency>(DEFAULT_CURRENCY);
     const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
-    const [theme, setThemeState] = useState<Theme>('system');
+    // THEME LOCKED: Force dark mode until UI is optimized for theme switching
+    const [theme, setThemeState] = useState<Theme>('dark');
 
     useEffect(() => {
         const storedCurrency = localStorage.getItem('skyspeed_currency');
@@ -57,42 +58,22 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        if (storedTheme) {
-            if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
-                setThemeState(storedTheme as Theme);
-            }
-        }
+        // THEME LOCKED: Ignore stored theme preferences
+        // if (storedTheme) {
+        //     if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+        //         setThemeState(storedTheme as Theme);
+        //     }
+        // }
     }, []);
 
-    // Theme Effect
+    // THEME LOCKED: Always apply dark mode regardless of settings
     useEffect(() => {
         const root = window.document.documentElement;
-
-        const removeOldTheme = () => {
-            root.classList.remove('dark');
-            root.classList.remove('light');
-        };
-
-        const applyTheme = (t: Theme) => {
-            removeOldTheme();
-            if (t === 'system') {
-                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                root.classList.add(systemTheme);
-            } else {
-                root.classList.add(t);
-            }
-        };
-
-        applyTheme(theme);
-
-        if (theme === 'system') {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handleChange = () => applyTheme('system');
-            mediaQuery.addEventListener('change', handleChange);
-            return () => mediaQuery.removeEventListener('change', handleChange);
-        }
-
-    }, [theme]);
+        // Remove any existing theme classes
+        root.classList.remove('light', 'dark');
+        // Force dark mode
+        root.classList.add('dark');
+    }, []); // Empty dependency array - only run once on mount
 
     const setCurrency = (c: Currency) => {
         setCurrencyState(c);
@@ -104,9 +85,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('skyspeed_language', JSON.stringify(l));
     };
 
+    // THEME LOCKED: No-op function, theme changes are disabled
     const setTheme = (t: Theme) => {
-        setThemeState(t);
-        localStorage.setItem('skyspeed_theme', t);
+        console.warn('Theme switching is currently disabled. App is locked to dark mode.');
+        // setThemeState(t);
+        // localStorage.setItem('skyspeed_theme', t);
     };
 
     return (

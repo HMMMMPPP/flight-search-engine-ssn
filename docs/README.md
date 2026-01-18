@@ -35,6 +35,7 @@ Contribution guidelines, coding standards, and best practices.
 
 ### 📋 [Project](./project/)
 Project status, roadmap, and implementation history.
+- [Features](./project/features.md)
 - [MVP Implementation](./project/mvp-implementation.md)
 - [Roadmap](./project/roadmap.md)
 - [Changelog](./project/changelog.md)

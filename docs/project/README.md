@@ -4,6 +4,12 @@ This section contains project status, roadmap, and implementation history.
 
 ## 📁 Documentation
 
+### [Features](./features.md)
+Current feature status tracker with implemented, in-progress, and planned features.
+- Implemented features
+- Features in development
+- Future roadmap items
+
 ### [MVP Implementation](./mvp-implementation.md)
 Complete MVP implementation plan and feature breakdown.
 - Architecture and setup decisions
@@ -19,11 +25,11 @@ Future feature roadmap and development priorities.
 - Phase timelines
 
 ### [Changelog](./changelog.md)
-Version history and major milestones.
-- Release notes
-- Feature additions
-- Bug fixes
-- Breaking changes
+Version history, release notes, bug fixes, and feature additions.
+- Release notes with version numbers
+- New features and improvements
+- Bug fixes and patches
+- Breaking changes and deprecations
 
 ## 📊 Current Status
 
@@ -50,12 +56,13 @@ Version history and major milestones.
 | **AI Assistant** | ✅ | ✅ | ✅ | ✅ |
 | **Core Lib** | ✅ | ✅ | ⏳ | ✅ |
 | **User Profile** | ❌ | ❌ | ❌ | ❌ |
-| **Booking** | ❌ | ❌ | ❌ | ❌ |
+| **Booking** | ⏳ | ✅ | ⏳ | ❌ |
 
 > **Legend**: ✅ Done, ⏳ In Progress, ❌ Pending
 
 ## 🔗 Related Documentation
 
+- [Features](./features.md)
 - [MVP Implementation](./mvp-implementation.md)
 - [Roadmap](./roadmap.md)
 - [Changelog](./changelog.md)

@@ -132,6 +132,7 @@ For comprehensive documentation, visit the **[`docs/`](./docs/)** directory:
 - **[Deployment](./docs/deployment/)** - Production deployment guides
 - **[Development](./docs/development/)** - Contribution guidelines and coding standards
 - **[Monitoring](./docs/monitoring/)** - Observability and error tracking setup
+- **[Project](./docs/project/)** - Roadmap, features, and changelog
 
 ---
 

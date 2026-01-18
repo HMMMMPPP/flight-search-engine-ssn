@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.0.1] - 2026-01-19
+
+### Added
+- Booking page placeholder with development status message
+
+### Fixed
+- Theme system locked to dark mode to prevent UI issues until theme optimization is complete
+
 ## [1.0.0] - 2026-01-19
 
 ### Added

@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { AIRPORT_CODES } from '@/lib/data/airports';
 import { useSettings } from '@/context/SettingsContext';
 import { getFlightRecommendationType } from '@/lib/agents/strategist';
+import { useRouter } from 'next/navigation';
 
 interface BentoFlightCardProps {
     flight: Flight;
@@ -21,6 +22,7 @@ interface BentoFlightCardProps {
 export function BentoFlightCard({ flight, index, dictionaries, onToggle, id, batchAnalysis }: BentoFlightCardProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const isBestVibe = flight.vibe?.score ? flight.vibe.score > 8.5 : false;
+    const router = useRouter();
 
     // Helper for names
     const getLocationName = (code: string) => {
@@ -209,9 +211,16 @@ export function BentoFlightCard({ flight, index, dictionaries, onToggle, id, bat
                     onClick={() => {
                         // Clicking Select implies we are interested
                         if (onToggle) onToggle(true);
-                        const query = `Book flight ${flight.airline} ${flight.flightNumber || ''} from ${flight.departure.code} to ${flight.arrival.code}`;
-                        const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-                        window.open(url, '_blank');
+
+                        // Navigate to booking page with flight details
+                        const params = new URLSearchParams({
+                            origin: flight.departure.code,
+                            destination: flight.arrival.code,
+                            airline: airlineName,
+                            price: `${currency.symbol}${Number(flight.price).toFixed(2)}`,
+                        });
+
+                        router.push(`/booking?${params.toString()}`);
                     }}
                     className="bg-white text-black text-sm font-bold py-2 px-6 rounded-lg hover:bg-slate-200 transition-colors shadow-lg shadow-white/5 flex items-center gap-2"
                 >
