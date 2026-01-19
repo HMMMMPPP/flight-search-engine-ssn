@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.0.4] - 2026-01-20
+
+### Changed
+- Replaced legacy `favicon.ico` with modern `icon.png` (Stylized 'S')
+- Updated `layout.tsx` title and metadata for cleaner branding
+- Relocated favicon to `public/` directory for better static file handling
+
 ## [1.0.3] - 2026-01-20
 
 ### Changed

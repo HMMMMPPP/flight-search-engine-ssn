@@ -16,14 +16,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SkySpeed Neo | AI-Powered Flight Search Engine",
+  title: "SkySpeed Neo",
   description: "Find the best flight deals with AI-powered search. Real-time price analysis, smart filters, and strategic booking advice powered by Amadeus Intelligence.",
   keywords: ["flight search", "cheap flights", "flight deals", "AI flight search", "Amadeus", "travel", "flight booking"],
   authors: [{ name: "SkySpeed Team" }],
   creator: "SkySpeed Neo",
+  icons: {
+    icon: '/icon.png',
+  },
   metadataBase: new URL('https://skyspeed-neo.netlify.app'), // Update with your actual domain
   openGraph: {
-    title: "SkySpeed Neo | AI-Powered Flight Search",
+    title: "SkySpeed Neo",
     description: "Smart flight search with AI-powered price predictions and strategic booking advice",
     type: "website",
     locale: "en_US",
@@ -31,7 +34,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SkySpeed Neo | AI Flight Search",
+    title: "SkySpeed Neo",
     description: "Find the best flight deals with AI-powered analysis",
   },
   robots: {
