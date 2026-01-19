@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved utility scripts to `scripts/` directory
 - Updated import paths across the codebase to use new type locations
 
+### Performance
+- Removed simulated latency (300ms) from `swarm-engine` for faster production searches
+- Optimized agent orchestration flow
+- Implemented 1-hour caching layer for `getCheapestDates` API calls to reduce Amadeus quota usage
+
 ### Removed
 - Unused Sentry example files and routes
 - Legacy `check_routes.ts` file (moved to scripts)
