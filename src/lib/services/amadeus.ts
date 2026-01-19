@@ -1,6 +1,7 @@
 import Amadeus from 'amadeus';
 import { amadeusRateLimiter } from '../utils/rateLimiter';
 import { logAPICall } from '../utils/apiLogger';
+import { cacheService } from './cache';
 
 const amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
@@ -57,10 +58,24 @@ export const amadeusService = {
     getCheapestDates: async (origin: string, destination: string) => {
         const startTime = Date.now();
         try {
+            // Cache Key Strategy: Cheapest dates are relatively stable approx 1 hour.
+            const cacheKey = `cheapest_dates_${origin}_${destination}`;
+            const cachedParams = await cacheService.get(cacheKey);
+
+            if (cachedParams) {
+                // Log Cache Hit (Optional: lightweight log or debug only)
+                // console.log(`[Cache Hit] getCheapestDates for ${origin}-${destination}`);
+                return cachedParams;
+            }
+
             const response = await amadeusRateLimiter.throttle<any>(() => amadeus.shopping.flightDates.get({
                 origin: origin,
                 destination: destination
             }));
+
+            // Cache result for 1 hour
+            cacheService.set(cacheKey, response.data, 3600);
+
             await logAPICall('amadeus', 'getCheapestDates', 'success', Date.now() - startTime);
             return response.data;
         } catch (error) {

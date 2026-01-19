@@ -10,6 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.0.3] - 2026-01-20
+
+### Changed
+- Refactored shared types to `src/types/index.ts`
+- Refactored schemas to `src/types/schemas.ts`
+- Moved utility scripts to `scripts/` directory
+- Updated import paths across the codebase to use new type locations
+
+### Removed
+- Unused Sentry example files and routes
+- Legacy `check_routes.ts` file (moved to scripts)
+
+### Documentation
+- Added documentation for `instrumentation.ts` and `instrumentation-client.ts` in `structure.md`
+- Updated `sentry-setup.md` with instrumentation details
+
 ## [1.0.2] - 2026-01-19
 
 ### Fixed

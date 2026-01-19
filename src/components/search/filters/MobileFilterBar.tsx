@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronDown } from 'lucide-react';
-import { FilterCriteria, FilterOptions } from '@/lib/types';
+import { FilterCriteria, FilterOptions } from '@/types';
 import { FilterSection, toTitleCase, SmoothSlider, CountryGroup, groupAirportsByCountry } from './FilterShared';
 import { TimePriceSlider } from '@/components/ui/TimePriceSlider';
 import { AIRPORT_DETAILS } from '@/lib/data/airports';

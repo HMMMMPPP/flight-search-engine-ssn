@@ -1,4 +1,4 @@
-import { Flight, FlightAnalysis } from '../types';
+import { Flight, FlightAnalysis } from '@/types';
 import { parseDuration } from '../utils/flightFilters';
 import { calculateMergedHistory, calculateMarketAverage } from '../utils/priceAnalysis';
 

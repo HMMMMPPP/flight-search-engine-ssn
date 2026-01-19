@@ -62,4 +62,13 @@ This document outlines the current structure of the Flight Search Engine MVP. Mo
 - **[src/lib/agents](src/lib/agents)**: AI Strategist logic (`strategist.ts`).
 - **[src/lib/services](src/lib/services)**: Amadeus API integration (`amadeus.ts`).
 - **[src/lib/utils/flightFilters.ts](src/lib/utils/flightFilters.ts)**: Filtering logic shared by Mobile and Desktop filters.
-- **[src/lib/types.ts](src/lib/types.ts)**: TypeScript definitions for Flights, Filters, and State.
+- **[src/types/index.ts](src/types/index.ts)**: TypeScript definitions for Flights, Filters, and State.
+
+## ⚙️ Root Configuration & Instrumentation
+*Entry points for Next.js app initialization and observability.*
+
+- **[src/instrumentation.ts](src/instrumentation.ts)**
+  - **Purpose**: Server-side boot hook. Registers Sentry for Node.js and Edge runtimes when the server starts.
+- **[src/instrumentation-client.ts](src/instrumentation-client.ts)**
+  - **Purpose**: Client-side boot hook. Initializes Sentry in the browser environment.
+

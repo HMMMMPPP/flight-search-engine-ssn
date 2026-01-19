@@ -1,4 +1,4 @@
-import { Flight, UserIntent } from '../types';
+import { Flight, UserIntent } from '@/types';
 import { amadeusService } from '../services/amadeus';
 
 export const aggregatorAgent = async (intent: UserIntent): Promise<{ flights: Flight[], dictionaries?: any }> => {

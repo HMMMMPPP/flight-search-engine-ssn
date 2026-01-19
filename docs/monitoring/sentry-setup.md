@@ -67,9 +67,9 @@ Visit your site, wait 2 seconds, check Sentry dashboard for the error.
 
 ## ✅ What's Already Configured
 
-- ✅ Client-side error tracking (`sentry.client.config.ts`)
-- ✅ Server-side error tracking (`sentry.server.config.ts`)
-- ✅ Edge runtime support (`sentry.edge.config.ts`)
+- ✅ Client-side error tracking (`sentry.client.config.ts` loaded via `instrumentation-client.ts`)
+- ✅ Server-side error tracking (`sentry.server.config.ts` loaded via `instrumentation.ts`)
+- ✅ Edge runtime support (`sentry.edge.config.ts` loaded via `instrumentation.ts`)
 - ✅ Noise filtering (ResizeObserver, chrome-extension errors filtered)
 - ✅ Session Replay (10% of sessions, 100% on errors)
 - ✅ Production-only tracking (saves quota in dev)

@@ -1,4 +1,4 @@
-import { UserIntent } from '../types';
+import { UserIntent } from '@/types';
 
 export const parserAgent = async (query: string): Promise<UserIntent> => {
     // Simulate LLM Processing time

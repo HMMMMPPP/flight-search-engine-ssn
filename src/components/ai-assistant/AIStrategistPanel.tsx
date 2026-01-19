@@ -3,11 +3,11 @@
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, TrendingDown, TrendingUp, Zap, Coffee, Wallet } from 'lucide-react';
-import { Flight, FlightAnalysis } from '@/lib/types';
+import { Flight, FlightAnalysis } from '@/types';
 import { analyzeBatch, generateFlightAnalysis } from '@/lib/agents/strategist';
 
 import { AICommandBar } from './AICommandBar';
-import { FilterCriteria } from '@/lib/types';
+import { FilterCriteria } from '@/types';
 
 
 interface AIStrategistPanelProps {

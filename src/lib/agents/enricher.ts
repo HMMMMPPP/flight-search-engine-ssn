@@ -1,4 +1,4 @@
-import { Flight } from '../types';
+import { Flight } from '@/types';
 import { AIRCRAFT_DB, DEFAULT_AIRCRAFT } from '../data/aircraft';
 
 export const enricherAgent = async (flights: Flight[]): Promise<Flight[]> => {

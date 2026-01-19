@@ -1,6 +1,6 @@
 'use client';
 
-import { Flight, FlightAnalysis } from '@/lib/types';
+import { Flight, FlightAnalysis } from '@/types';
 import { motion } from 'framer-motion';
 import { Luggage, Armchair, TrendingUp, TrendingDown, Info } from 'lucide-react';
 import clsx from 'clsx';

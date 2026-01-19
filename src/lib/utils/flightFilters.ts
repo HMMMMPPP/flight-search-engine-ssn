@@ -1,4 +1,4 @@
-import { Flight, FilterCriteria, FilterOptions } from '@/lib/types';
+import { Flight, FilterCriteria, FilterOptions } from '@/types';
 
 /**
  * Extracts available filter options from a list of flights.

@@ -1,5 +1,5 @@
 import { strategistAgent } from '../src/lib/agents/strategist';
-import { Flight } from '../src/lib/types';
+import { Flight } from '../src/types';
 
 // Mock Flight Data
 const mockFlights: Flight[] = [

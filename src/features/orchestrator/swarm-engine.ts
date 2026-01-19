@@ -3,8 +3,8 @@ import { aggregatorAgent } from '@/lib/agents/aggregator_v2';
 import { amadeusService } from '@/lib/services/amadeus';
 import { enricherAgent } from '@/lib/agents/enricher';
 import { strategistAgent } from '@/lib/agents/strategist';
-import { Flight, UserIntent } from '@/lib/types';
-import { UserIntentSchema } from '@/lib/schema';
+import { Flight, UserIntent } from '@/types';
+import { UserIntentSchema } from '@/types/schemas';
 
 export async function orchestrateSearch(formData: FormData): Promise<{ flights: Flight[], priceHistory?: any[], dictionaries?: any }> {
     const searchId = `SwarmLatency-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -38,7 +38,8 @@ export async function orchestrateSearch(formData: FormData): Promise<{ flights: 
     };
 
     // Simulate Parsing/Validation Latency
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Latency removed for production optimization
+    // await new Promise(resolve => setTimeout(resolve, 300));
 
     const intent = UserIntentSchema.parse(rawIntent) as UserIntent;
 

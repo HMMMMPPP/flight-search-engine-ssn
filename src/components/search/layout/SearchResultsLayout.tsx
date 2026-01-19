@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Flight, PriceMetrics, FilterCriteria } from '@/lib/types';
+import { Flight, PriceMetrics, FilterCriteria } from '@/types';
 import { FilterSidebar } from '@/components/search/filters/FilterSidebar';
 import { BentoFlightCard } from '@/components/flight/BentoFlightCard';
 import { PriceHistoryGraph } from '@/components/analytics/PriceHistoryGraph';

@@ -9,7 +9,7 @@ import {
     ResponsiveContainer,
     ReferenceLine
 } from 'recharts';
-import { Flight, PriceMetrics } from '@/lib/types';
+import { Flight, PriceMetrics } from '@/types';
 import { motion } from 'framer-motion';
 import { calculateMergedHistory, calculateIntradayMetrics, IntradayMetric } from '@/lib/utils/priceAnalysis';
 

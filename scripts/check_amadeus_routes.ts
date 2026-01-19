@@ -1,5 +1,5 @@
 
-import { amadeusService } from './lib/services/amadeus';
+import { amadeusService } from '../src/lib/services/amadeus';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -50,7 +50,7 @@ async function run() {
     }
 
     // Now Import Service
-    const { amadeusService } = await import('./lib/services/amadeus');
+    const { amadeusService } = await import('../src/lib/services/amadeus');
 
     const routes = await amadeusService.getFlightInspiration('MNL');
     console.log('--------------------------------');

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FilterCriteria } from '@/lib/types';
+import { FilterCriteria } from '@/types';
 import { X, Mic, Send, Sparkles, Loader2, ArrowRight } from 'lucide-react';
 
 interface AICommandBarProps {

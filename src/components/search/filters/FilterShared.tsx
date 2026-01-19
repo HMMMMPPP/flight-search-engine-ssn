@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { FilterCriteria, FilterOptions } from '@/lib/types';
+import { FilterCriteria, FilterOptions } from '@/types';
 import { AIRPORT_DETAILS } from '@/lib/data/airports';
 import { TimePriceSlider } from '@/components/ui/TimePriceSlider';
 

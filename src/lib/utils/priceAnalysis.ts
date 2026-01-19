@@ -1,4 +1,4 @@
-import { Flight } from "@/lib/types";
+import { Flight } from "@/types";
 
 export interface MergedPricePoint {
     date: string; // YYYY-MM-DD
