@@ -5,18 +5,27 @@ import { Flight, FilterCriteria, FilterOptions } from '@/types';
  * @param flights List of flights
  * @returns FilterOptions (min/max price, available airlines, etc.)
  */
+export const DEFAULT_FILTER_OPTIONS: FilterOptions = {
+    minPrice: 0,
+    maxPrice: 1000,
+    airlines: [],
+    minDuration: 0,
+    maxDuration: 0,
+    layoverMin: 0,
+    layoverMax: 0,
+    connectingAirports: [],
+    departureHistogram: new Array(24).fill(0),
+    arrivalHistogram: new Array(24).fill(0)
+};
+
+/**
+ * Extracts available filter options from a list of flights.
+ * @param flights List of flights
+ * @returns FilterOptions (min/max price, available airlines, etc.)
+ */
 export function extractFilters(flights: Flight[]): FilterOptions {
     if (flights.length === 0) {
-        return {
-            minPrice: 0,
-            maxPrice: 1000,
-            airlines: [],
-            minDuration: 0,
-            maxDuration: 0,
-            layoverMin: 0,
-            layoverMax: 0,
-            connectingAirports: []
-        };
+        return DEFAULT_FILTER_OPTIONS;
     }
 
     const prices = flights.map(f => f.price);

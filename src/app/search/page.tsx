@@ -1,4 +1,4 @@
-import { SortOption } from '@/lib/utils/flightFilters';
+import { SortOption, DEFAULT_FILTER_OPTIONS } from '@/lib/utils/flightFilters';
 import { orchestrateSearch } from '@/features/orchestrator/swarm-engine';
 import Link from 'next/link';
 import { SearchResultsLayout } from '@/components/search/layout/SearchResultsLayout';
@@ -118,7 +118,7 @@ export default async function SearchPage({
                 returnDate={returnDate}
                 pagination={pagination}
                 // Server-Side Orchestration Props
-                filterOptions={filterOptions}
+                filterOptions={filterOptions ?? DEFAULT_FILTER_OPTIONS}
                 activeFilters={currentFilters}
                 sortBy={safeSort}
                 // Global Analysis
