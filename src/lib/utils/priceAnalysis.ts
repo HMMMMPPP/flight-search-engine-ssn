@@ -85,14 +85,25 @@ export function calculateIntradayMetrics(flights: Flight[]): IntradayMetric[] {
 
     // Populate buckets
     flights.forEach(f => {
-        // Extract hour directly from string to avoid Timezone shifts (Server vs Client)
-        // Format: "YYYY-MM-DDTHH:MM:SS" -> "HH"
         try {
-            const timePart = f.departure.time.includes('T') ? f.departure.time.split('T')[1] : f.departure.time;
-            const hourStr = timePart.split(':')[0];
-            const hour = parseInt(hourStr, 10);
+            // Optimization: Fast String Slicing
+            // ISO Format: 2023-10-05T14:30:00
+            // Index of T is usually 10. Hour is at 11,12.
+            let hour = 0;
+            const tIndex = f.departure.time.indexOf('T');
+            if (tIndex > -1) {
+                // Parse "14" from "...T14:..."
+                // Character code math is faster than parseInt
+                const h1 = f.departure.time.charCodeAt(tIndex + 1) - 48;
+                const h2 = f.departure.time.charCodeAt(tIndex + 2) - 48;
+                hour = (h1 * 10) + h2;
+            } else {
+                // Fallback
+                const date = new Date(f.departure.time);
+                hour = date.getHours();
+            }
 
-            if (!isNaN(hour) && hour >= 0 && hour <= 23) {
+            if (hour >= 0 && hour <= 23) {
                 buckets[hour].push(f.price);
             }
         } catch (e) {

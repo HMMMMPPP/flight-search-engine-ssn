@@ -44,6 +44,12 @@ We use a specialized `SearchCache` for the Orchestrator Engine. This caches the 
     4.  User clicks "Page 2" or "Filter by Price".
     5.  Engine detects same search parameters (excluding page/filter), hits cache, applies filters/slicing in memory (< 10ms), and returns new view.
 
+### Micro-Caching (`src/lib/utils/flightFilters.ts`)
+
+We use lightweight memoization for high-frequency utility functions:
+-   **Duration Parsing**: `Map<string, number>` caches parsed ISO durations (e.g., "PT2H30M") to avoid repetitive regex/loop operations on thousands of flight segments.
+
+
 ## Configuration
 
 - **Default TTL**: 1 hour (3600 seconds).

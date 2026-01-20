@@ -32,7 +32,10 @@ interface FilterSidebarProps {
  * - Connecting airports
  */
 export function FilterSidebar({ filters, setFilters, options }: FilterSidebarProps) {
-
+    // Local State for Sliders (Performance Optimization)
+    // We only trigger the parent `setFilters` (which updates URL) when the user *releases* the slider.
+    const [depWindow, setDepWindow] = useState<[number, number]>(filters.departureWindow || [0, 1440]);
+    const [arrWindow, setArrWindow] = useState<[number, number]>(filters.arrivalWindow || [0, 1440]);
 
 
     const handleAirlineToggle = (airline: string) => {
@@ -131,8 +134,9 @@ export function FilterSidebar({ filters, setFilters, options }: FilterSidebarPro
                         label="Departure"
                         cityCode={undefined}
                         histogram={options.departureHistogram || new Array(24).fill(0)}
-                        window={filters.departureWindow || [0, 1440]}
-                        onChange={(vals: number[]) => setFilters({ ...filters, departureWindow: vals as [number, number] })}
+                        window={depWindow}
+                        onChange={(vals) => setDepWindow(vals)} // Only update local visual state
+                        onCommit={(vals) => setFilters({ ...filters, departureWindow: vals })} // Update Actual Filters on Drop
                     />
                 </div>
 
@@ -142,8 +146,9 @@ export function FilterSidebar({ filters, setFilters, options }: FilterSidebarPro
                         label="Return"
                         cityCode={undefined}
                         histogram={options.arrivalHistogram || new Array(24).fill(0)}
-                        window={filters.arrivalWindow || [0, 1440]}
-                        onChange={(vals: number[]) => setFilters({ ...filters, arrivalWindow: vals as [number, number] })}
+                        window={arrWindow}
+                        onChange={(vals) => setArrWindow(vals)}
+                        onCommit={(vals) => setFilters({ ...filters, arrivalWindow: vals })}
                     />
                 </div>
 

@@ -2,13 +2,22 @@
 import { aggregatorAgent } from '@/lib/agents/aggregator_v2';
 import { amadeusService } from '@/lib/services/amadeus';
 import { enricherAgent } from '@/lib/agents/enricher';
-import { strategistAgent } from '@/lib/agents/strategist';
-import { Flight, UserIntent, FilterCriteria } from '@/types';
+import { strategistAgent, analyzeBatch } from '@/lib/agents/strategist';
+import { Flight, UserIntent, FilterCriteria, FlightAnalysis } from '@/types';
 import { UserIntentSchema } from '@/types/schemas';
 import { searchCache } from '@/lib/utils/cache';
 import { filterFlights, sortFlights, SortOption, extractFilters } from '@/lib/utils/flightFilters';
+import { calculateIntradayMetrics, IntradayMetric } from '@/lib/utils/priceAnalysis';
 
-export async function orchestrateSearch(formData: FormData): Promise<{ flights: Flight[], priceHistory?: any[], dictionaries?: any, pagination?: any, filterOptions?: any }> {
+export async function orchestrateSearch(formData: FormData): Promise<{
+    flights: Flight[],
+    priceHistory?: any[],
+    dictionaries?: any,
+    pagination?: any,
+    filterOptions?: any,
+    flightAnalysis?: FlightAnalysis,
+    intradayMetrics?: IntradayMetric[]
+}> {
     const searchId = `SwarmLatency-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     console.time(searchId);
 
@@ -135,11 +144,23 @@ export async function orchestrateSearch(formData: FormData): Promise<{ flights: 
     const stops = formData.get('stops')?.toString().split(',').map(Number).filter(n => !isNaN(n)) || [];
     const maxDuration = formData.get('maxDuration') ? parseInt(formData.get('maxDuration')!.toString(), 10) : undefined;
 
+    // Advanced Filters Extraction
+    const depWindow = formData.get('depWindow')?.toString().split('-').map(Number) as [number, number] | undefined;
+    const arrWindow = formData.get('arrWindow')?.toString().split('-').map(Number) as [number, number] | undefined;
+    const hasBaggage = formData.get('baggage') === 'true';
+    const maxLayoverDuration = formData.get('layover') ? parseInt(formData.get('layover')!.toString(), 10) : undefined;
+    const connectingAirports = formData.get('connections')?.toString().split(',').filter(Boolean) || [];
+
     const filterCriteria: FilterCriteria = {
         maxPrice: maxPrice || 100000,
         airlines: airlines,
         stops: stops,
         maxDuration: maxDuration,
+        departureWindow: depWindow,
+        arrivalWindow: arrWindow,
+        hasBaggage: hasBaggage,
+        maxLayoverDuration: maxLayoverDuration,
+        connectingAirports: connectingAirports
     };
 
     // 1.5 Calculate Facets (Global Options before filtering)
@@ -165,6 +186,13 @@ export async function orchestrateSearch(formData: FormData): Promise<{ flights: 
     const paginatedFlights = sortedFlights.slice(startIndex, endIndex);
     const totalPages = Math.ceil(totalCount / limit);
 
+    // 3.5 Global Analysis (New: Run on ALL filtered flights before pagination)
+    // This allows the AI Strategist and Price Graph to see the whole market context
+    console.time('GlobalAnalysis');
+    const flightAnalysis = analyzeBatch(filteredFlights, priceAnalysis);
+    const intradayMetrics = calculateIntradayMetrics(filteredFlights);
+    console.timeEnd('GlobalAnalysis');
+
     console.timeEnd(searchId);
     return {
         flights: paginatedFlights,
@@ -177,6 +205,8 @@ export async function orchestrateSearch(formData: FormData): Promise<{ flights: 
             totalCount,
             limit,
             hasMore: page < totalPages
-        }
+        },
+        flightAnalysis,
+        intradayMetrics
     };
 }

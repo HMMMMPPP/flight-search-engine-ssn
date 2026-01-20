@@ -8,6 +8,7 @@ interface DualRangeSliderProps {
     minVal: number;
     maxVal: number;
     onChange: (values: [number, number]) => void;
+    onCommit?: (values: [number, number]) => void;
     formatLabel?: (val: number) => string;
 }
 
@@ -17,6 +18,7 @@ export const DualRangeSlider: React.FC<DualRangeSliderProps> = ({
     minVal,
     maxVal,
     onChange,
+    onCommit,
     formatLabel
 }) => {
     const [minValState, setMinValState] = useState(minVal);
@@ -24,6 +26,7 @@ export const DualRangeSlider: React.FC<DualRangeSliderProps> = ({
     const minValRef = useRef(minVal);
     const maxValRef = useRef(maxVal);
     const range = useRef<HTMLDivElement>(null);
+    const [isDragging, setIsDragging] = useState(false);
 
     // Convert to percentage
     const getPercent = useCallback(
@@ -52,13 +55,26 @@ export const DualRangeSlider: React.FC<DualRangeSliderProps> = ({
         }
     }, [maxValState, getPercent]);
 
-    // Props change
+    // Props change: SYNC ONLY IF NOT DRAGGING
     useEffect(() => {
-        setMinValState(minVal);
-        setMaxValState(maxVal);
-        minValRef.current = minVal;
-        maxValRef.current = maxVal;
-    }, [minVal, maxVal]);
+        if (!isDragging) {
+            setMinValState(minVal);
+            setMaxValState(maxVal);
+            minValRef.current = minVal;
+            maxValRef.current = maxVal;
+        }
+    }, [minVal, maxVal, isDragging]);
+
+    const handleCommit = () => {
+        setIsDragging(false);
+        if (onCommit) {
+            onCommit([minValState, maxValState]);
+        }
+    };
+
+    const handleStart = () => {
+        setIsDragging(true);
+    };
 
     return (
         <div className="container relative h-12 flex items-center justify-center w-full">
@@ -73,6 +89,10 @@ export const DualRangeSlider: React.FC<DualRangeSliderProps> = ({
                     minValRef.current = value;
                     onChange([value, maxValState]);
                 }}
+                onMouseDown={handleStart}
+                onTouchStart={handleStart}
+                onMouseUp={handleCommit}
+                onTouchEnd={handleCommit}
                 className="thumb thumb--left z-[3] absolute w-full pointer-events-none opacity-0 cursor-pointer h-0"
                 style={{ zIndex: minValState > max - 100 ? 5 : 3 }}
             />
@@ -87,6 +107,10 @@ export const DualRangeSlider: React.FC<DualRangeSliderProps> = ({
                     maxValRef.current = value;
                     onChange([minValState, value]);
                 }}
+                onMouseDown={handleStart}
+                onTouchStart={handleStart}
+                onMouseUp={handleCommit}
+                onTouchEnd={handleCommit}
                 className="thumb thumb--right z-[4] absolute w-full pointer-events-none opacity-0 cursor-pointer h-0"
             />
 

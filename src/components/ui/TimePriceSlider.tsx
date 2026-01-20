@@ -8,6 +8,7 @@ interface TimePriceSliderProps {
     histogram: number[]; // 24 values (price per hour, 0 if no flights)
     window: [number, number];
     onChange: (val: [number, number]) => void;
+    onCommit?: (val: [number, number]) => void;
     cityCode?: string;
 }
 
@@ -16,10 +17,12 @@ export const TimePriceSlider: React.FC<TimePriceSliderProps> = ({
     histogram,
     window,
     onChange,
+    onCommit,
     cityCode
 }) => {
     // 1. Determine Range for Scaling
     // Filter out 0s to find min/max displayed prices
+    // ... (rest of logic) ...
     const prices = histogram.filter(p => p > 0);
     const minPrice = Math.min(...prices, 0); // avoid infinity
     const maxPrice = Math.max(...prices, 100);
@@ -90,6 +93,7 @@ export const TimePriceSlider: React.FC<TimePriceSliderProps> = ({
                         minVal={window[0] ?? 0}
                         maxVal={window[1] ?? 1440}
                         onChange={onChange}
+                        onCommit={onCommit}
                     />
                 </div>
                 {/* Time Labels */}

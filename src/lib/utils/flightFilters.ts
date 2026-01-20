@@ -143,22 +143,40 @@ export function filterFlights(flights: Flight[], criteria: FilterCriteria): Flig
     });
 }
 
+const durationCache = new Map<string, number>();
+
 export function parseDuration(durationArgs: string): number {
-    // Handles ISO "PT10H30M" and Friendly "10h30m"
     if (!durationArgs) return 0;
 
-    const input = durationArgs.toUpperCase();
-    let hours = 0;
-    let minutes = 0;
+    // Check Cache
+    if (durationCache.has(durationArgs)) {
+        return durationCache.get(durationArgs)!;
+    }
 
-    // Robust extraction: Look for Digits followed by H or M
-    const hMatch = input.match(/(\d+)H/);
-    const mMatch = input.match(/(\d+)M/);
+    const input = durationArgs.toUpperCase().replace('PT', '');
+    let totalMinutes = 0;
 
-    if (hMatch) hours = parseInt(hMatch[1], 10);
-    if (mMatch) minutes = parseInt(mMatch[1], 10);
+    // Optimization: Single Pass Parsing
+    // Format usually 2H30M, 45M, 1H
+    let currentVal = 0;
+    for (let i = 0; i < input.length; i++) {
+        const char = input[i];
+        if (char >= '0' && char <= '9') {
+            currentVal = currentVal * 10 + (char.charCodeAt(0) - 48);
+        } else if (char === 'H') {
+            totalMinutes += currentVal * 60;
+            currentVal = 0;
+        } else if (char === 'M') {
+            totalMinutes += currentVal;
+            currentVal = 0;
+        }
+    }
 
-    return (hours * 60) + minutes;
+    // Cache result (Duration strings are highly repetitive)
+    if (durationCache.size > 1000) durationCache.clear(); // Prevent memory leak
+    durationCache.set(durationArgs, totalMinutes);
+
+    return totalMinutes;
 }
 
 function getMinutesFromDate(isoString: string): number {

@@ -19,11 +19,12 @@ interface PriceHistoryGraphProps {
     selectedDate?: string;
     returnDate?: string;
     onSelectPricePoint?: (flightId: string) => void;
+    intradayData?: IntradayMetric[];
 }
 
-export function PriceHistoryGraph({ flights, priceHistory, selectedDate, returnDate, onSelectPricePoint }: PriceHistoryGraphProps) {
+export function PriceHistoryGraph({ flights, priceHistory, selectedDate, returnDate, onSelectPricePoint, intradayData }: PriceHistoryGraphProps) {
     const [hoveredPrice, setHoveredPrice] = useState<number | null>(null);
-    const hasData = (flights && flights.length > 0) || (priceHistory && priceHistory.length > 0);
+    const hasData = (flights && flights.length > 0) || (priceHistory && priceHistory.length > 0) || (intradayData && intradayData.length > 0);
     if (!hasData) return null;
 
     // DETERMINE MODE: 
@@ -42,7 +43,7 @@ export function PriceHistoryGraph({ flights, priceHistory, selectedDate, returnD
 
     // --- LOGIC: INTRADAY ANALYST (One Way) ---
     if (mode === 'INTRADAY') {
-        const metrics = calculateIntradayMetrics(flights);
+        const metrics = intradayData || calculateIntradayMetrics(flights);
         xKey = 'label';
         toolTipLabel = 'Time';
 

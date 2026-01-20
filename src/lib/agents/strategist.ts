@@ -45,52 +45,83 @@ export const strategistAgent = async (flights: Flight[]): Promise<Flight[]> => {
 };
 
 export function analyzeBatch(flights: Flight[], priceHistory?: any[]): FlightAnalysis {
-    const prices = flights.map(f => f.price);
-    const durations = flights.map(f => parseDuration(f.duration));
-    const vibes = flights.map(f => f.vibe?.score || 5);
-
-    // Basic Stats
-    const minPrice = Math.min(...prices);
-
-    // IMPACT FIX: Use Market History for Mean Price if available, otherwise fallback to local batch
-    let meanPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
-    let marketSource = 'local';
-
-    if (priceHistory && priceHistory.length > 0) {
-        // Calculate mean from the historical/market data points
-        const historyPrices = priceHistory.map(p => p.price);
-        const historyMean = historyPrices.reduce((a: number, b: number) => a + b, 0) / historyPrices.length;
-
-        // Use the history mean as the "Market Average" reference
-        meanPrice = historyMean;
-        marketSource = 'market';
+    if (!flights || flights.length === 0) {
+        return {
+            meanPrice: 0,
+            standardDeviation: 0,
+            cheapest: '',
+            fastest: '',
+            bestVibe: '',
+        };
     }
 
-    // Standard Deviation (Price) - Calculate against the specific set used? 
-    // Usually StdDev describes the spread of the *current* set. 
-    // But for "High/Low" classification, we might want to know if a flight is an outlier in the *Market*.
-    // Let's keep StdDev based on current flights to see local variance, but compare against Market Mean.
-    const variance = prices.reduce((sum, price) => sum + Math.pow(price - meanPrice, 2), 0) / prices.length;
-    const stdDev = Math.sqrt(variance);
+    let minPrice = Infinity;
+    let sumPrice = 0;
+    let cheapestId = '';
 
-    // Identify Outliers
-    const cheapestId = flights.find(f => f.price === minPrice)?.id || '';
-    const fastestId = flights.reduce((prev, curr) => parseDuration(prev.duration) < parseDuration(curr.duration) ? prev : curr).id;
-    const bestVibeId = flights.reduce((prev, curr) => (prev.vibe?.score || 0) > (curr.vibe?.score || 0) ? prev : curr).id;
+    let minDuration = Infinity;
+    let fastestId = '';
+
+    let maxVibeScore = -1;
+    let bestVibeId = '';
+
+    const prices: number[] = []; // Keep for StdDev (needed 2nd pass or Welford's algorithm)
+
+    // Single Pass Loop
+    for (const f of flights) {
+        // Price Stats
+        const p = f.price;
+        prices.push(p);
+        sumPrice += p;
+
+        if (p < minPrice) {
+            minPrice = p;
+            cheapestId = f.id;
+        }
+
+        // Duration Stats
+        const d = parseDuration(f.duration);
+        if (d < minDuration) {
+            minDuration = d;
+            fastestId = f.id;
+        }
+
+        // Vibe Stats
+        const v = f.vibe?.score || 5;
+        if (v > maxVibeScore) {
+            maxVibeScore = v;
+            bestVibeId = f.id;
+        }
+    }
+
+    // Mean Price Calculation
+    let meanPrice = sumPrice / flights.length;
+
+    // IMPACT FIX: Use Market History for Mean Price if available
+    if (priceHistory && priceHistory.length > 0) {
+        const historyPrices = priceHistory.map(p => p.price);
+        const historyMean = historyPrices.reduce((a: number, b: number) => a + b, 0) / historyPrices.length;
+        meanPrice = historyMean;
+    }
+
+    // StdDev Calculation (2nd tiny pass on primitives is fast)
+    // Variance = Sum((x - mean)^2) / N
+    let sqDiffSum = 0;
+    for (const p of prices) {
+        sqDiffSum += (p - meanPrice) ** 2; // Math.pow is slower than **
+    }
+    const variance = sqDiffSum / prices.length;
+    const stdDev = Math.sqrt(variance);
 
     // Opportunity Detection
     let opportunity: FlightAnalysis['opportunity'] = undefined;
 
-    // Scenario 1: Skewed High (Most flights expensive?)
-    // If mean is much higher than min, there's a big gap or "deal" at the bottom
     if (meanPrice - minPrice > stdDev) {
         opportunity = {
             type: 'savings',
             message: `Save $${(meanPrice - minPrice).toFixed(2)} by choosing our Smart Deal today.`
         };
-    }
-    // Scenario 2: High Prices (Min price > $1000 - simplistic check)
-    else if (minPrice > 1000) {
+    } else if (minPrice > 1000) {
         opportunity = {
             type: 'scarcity',
             message: 'Prices are high likely due to demand. Book soon.'

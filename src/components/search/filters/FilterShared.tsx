@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { FilterCriteria, FilterOptions } from '@/types';
@@ -84,10 +84,15 @@ export function SmoothSlider({ min, max, value, onChange, formatLabel, label }: 
     const [localValue, setLocalValue] = useState(value);
     const [isDragging, setIsDragging] = useState(false);
 
-    // Sync with external value when not dragging or when external value changes significantly
-    if (value !== localValue && !isDragging) {
-        setLocalValue(value);
-    }
+    // Sync with external value ONLY when it changes and we are NOT dragging.
+    // We use useEffect to avoid render-loop issues and ensure this only happens on prop updates.
+    useEffect(() => {
+        if (!isDragging) {
+            setLocalValue(value);
+        }
+    }, [value]);
+    // ^ Critical: Dependency is ONLY [value]. 
+    // We do NOT want to re-sync when isDragging changes to false, because 'value' prop might still be old.
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newVal = Number(e.target.value);

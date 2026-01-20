@@ -31,6 +31,13 @@ export default async function SearchPage({
     const stops = resolvedParams.stops as string;
     const maxDuration = resolvedParams.maxDuration as string;
 
+    // Advanced Filters
+    const depWindow = resolvedParams.depWindow as string;
+    const arrWindow = resolvedParams.arrWindow as string;
+    const baggage = resolvedParams.baggage as string;
+    const layover = resolvedParams.layover as string;
+    const connections = resolvedParams.connections as string;
+
     // Validate Sort Option to satisfy TypeScript union type
     const validSortOptions: SortOption[] = ['best', 'duration_asc', 'departure_asc', 'departure_desc'];
     const safeSort: SortOption = validSortOptions.includes(sort as SortOption)
@@ -55,14 +62,34 @@ export default async function SearchPage({
     if (stops) formData.append('stops', stops);
     if (maxDuration) formData.append('maxDuration', maxDuration);
 
+    // Append Advanced Filters
+    if (depWindow) formData.append('depWindow', depWindow);
+    if (arrWindow) formData.append('arrWindow', arrWindow);
+    if (baggage) formData.append('baggage', baggage);
+    if (layover) formData.append('layover', layover);
+    if (connections) formData.append('connections', connections);
+
     // Use orchestrateSearch directly (server-to-server)
-    const { flights, priceHistory, dictionaries, pagination, filterOptions } = await orchestrateSearch(formData);
+    const {
+        flights,
+        priceHistory,
+        dictionaries,
+        pagination,
+        filterOptions,
+        flightAnalysis,
+        intradayMetrics
+    } = await orchestrateSearch(formData);
 
     const currentFilters = {
         maxPrice: maxPrice ? parseFloat(maxPrice) : (filterOptions?.maxPrice || 10000),
         airlines: airlines ? airlines.split(',').filter(Boolean) : [],
         stops: stops ? stops.split(',').map(Number) : [],
         maxDuration: maxDuration ? parseInt(maxDuration, 10) : undefined,
+        departureWindow: depWindow ? depWindow.split('-').map(Number) as [number, number] : undefined,
+        arrivalWindow: arrWindow ? arrWindow.split('-').map(Number) as [number, number] : undefined,
+        hasBaggage: baggage === 'true',
+        maxLayoverDuration: layover ? parseInt(layover, 10) : undefined,
+        connectingAirports: connections ? connections.split(',').filter(Boolean) : [],
     };
 
     return (
@@ -94,6 +121,9 @@ export default async function SearchPage({
                 filterOptions={filterOptions}
                 activeFilters={currentFilters}
                 sortBy={safeSort}
+                // Global Analysis
+                globalAnalysis={flightAnalysis}
+                globalIntraday={intradayMetrics}
             />
 
         </main>

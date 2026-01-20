@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.1.1] - 2026-01-20
+
+### Performance
+- **Latency Optimization**: Optimized `parseDuration` with memoization and single-pass parsing, reducing overhead for 50k+ daily operations.
+- **Fast Analysis**: Refactored `analyzeBatch` to O(N) complexity (merged 8 loops into 1), significantly speeding up searching.
+- **Efficient Metrics**: Optimized `calculateIntradayMetrics` string parsing for faster graph generation.
+
+### Fixed
+- **Global Analysis Scope**: Fixed bug where `PriceHistory` and `AIStrategist` only saw the first 10 flights. They now correctly analyze the full dataset on the server.
+- **Slider Glitching**: Fixed "ghosting" / visual glitches on Price, Duration, and Layover sliders by implementing a Drag Lock mechanism (`isDragging` state) to decouple user interaction from server prop updates.
+- **Type Safety**: Fixed `SortOption` type mismatch in URL parsing.
+
 ## [1.1.0] - 2026-01-20
 
 ### Added

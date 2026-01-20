@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Flight, PriceMetrics, FilterCriteria, FilterOptions } from '@/types';
+import { Flight, PriceMetrics, FilterCriteria, FilterOptions, FlightAnalysis } from '@/types';
+import { IntradayMetric } from '@/lib/utils/priceAnalysis';
 import { FilterSidebar } from '@/components/search/filters/FilterSidebar';
 import { BentoFlightCard } from '@/components/flight/BentoFlightCard';
 import { PriceHistoryGraph } from '@/components/analytics/PriceHistoryGraph';
@@ -31,6 +32,8 @@ interface SearchResultsLayoutProps {
     filterOptions: FilterOptions;
     activeFilters: FilterCriteria;
     sortBy: SortOption;
+    globalAnalysis?: FlightAnalysis;
+    globalIntraday?: IntradayMetric[];
 }
 
 export function SearchResultsLayout({
@@ -42,7 +45,9 @@ export function SearchResultsLayout({
     pagination,
     filterOptions,
     activeFilters,
-    sortBy
+    sortBy,
+    globalAnalysis,
+    globalIntraday
 }: SearchResultsLayoutProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -80,6 +85,41 @@ export function SearchResultsLayout({
             params.set('maxDuration', newFilters.maxDuration.toString());
         } else {
             params.delete('maxDuration');
+        }
+
+        // Update Departure Window
+        if (newFilters.departureWindow && (newFilters.departureWindow[0] > 0 || newFilters.departureWindow[1] < 1440)) {
+            params.set('depWindow', newFilters.departureWindow.join('-'));
+        } else {
+            params.delete('depWindow');
+        }
+
+        // Update Arrival Window
+        if (newFilters.arrivalWindow && (newFilters.arrivalWindow[0] > 0 || newFilters.arrivalWindow[1] < 1440)) {
+            params.set('arrWindow', newFilters.arrivalWindow.join('-'));
+        } else {
+            params.delete('arrWindow');
+        }
+
+        // Update Baggage
+        if (newFilters.hasBaggage) {
+            params.set('baggage', 'true');
+        } else {
+            params.delete('baggage');
+        }
+
+        // Update Max Layover
+        if (newFilters.maxLayoverDuration) {
+            params.set('layover', newFilters.maxLayoverDuration.toString());
+        } else {
+            params.delete('layover');
+        }
+
+        // Update Connecting Airports
+        if (newFilters.connectingAirports && newFilters.connectingAirports.length > 0) {
+            params.set('connections', newFilters.connectingAirports.join(','));
+        } else {
+            params.delete('connections');
         }
 
         // Reset Page to 1 on filter change
@@ -174,10 +214,10 @@ export function SearchResultsLayout({
     };
 
     // 4.5. Flight Analysis Context
-    const flightAnalysis = useMemo(() => {
+    const flightAnalysis = globalAnalysis || useMemo(() => {
         if (!filteredFlights || filteredFlights.length === 0) return null;
         return analyzeBatch(filteredFlights, priceHistory);
-    }, [filteredFlights, priceHistory]);
+    }, [filteredFlights, priceHistory, globalAnalysis]);
 
     // 5. Price Point Handler
     const handlePricePointSelect = (flightId: string) => {
@@ -316,6 +356,7 @@ export function SearchResultsLayout({
                             selectedDate={selectedDate}
                             returnDate={returnDate}
                             onSelectPricePoint={handlePricePointSelect}
+                            intradayData={globalIntraday}
                         />
 
                         {/* AI Strategist (Replaces Alerts) */}
