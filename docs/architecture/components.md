@@ -6,8 +6,13 @@ This document tracks the organization and responsibility of key React components
 
 ### Filters (`/filters`)
 Responsible for managing and rendering search criteria refinements.
-- **`FilterSidebar.tsx`**: The main container for all filter widgets. Manages local UI state for collapsibles and delegates value updates to `setFilters`.
-- **`FilterShared.tsx`**: Reusable sub-components for the filter sidebar (`SmoothSlider`, `CountryGroup`, `DetailRow`).
+- **`FilterSidebar.tsx`**: The main container for all filter widgets (Desktop). Manages localized state before applying changes.
+- **`MobileFilterBar.tsx`**: The mobile-optimized bottom sheet for filters. Syncs state with the main search URL parameters.
+- **`FilterShared.tsx`**: Utility functions and types (`SmoothSlider`, `toTitleCase`) shared between mobile and desktop views.
+- **`shared/`**:
+  - **`AirlineCheckbox.tsx`**: Renders airline options with dictionary lookup.
+  - **`StopsCheckbox.tsx`**: Renders stop count toggles (Direct, 1 Stop, 2+).
+  - **`AirportGroup.tsx`**: Collapsible group of airport checkboxes by country.
 
 ### Form (`/form`)
 Responsible for capturing user search intent.

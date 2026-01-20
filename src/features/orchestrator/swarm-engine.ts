@@ -3,7 +3,7 @@ import { aggregatorAgent } from '@/lib/agents/aggregator_v2';
 import { amadeusService } from '@/lib/services/amadeus';
 import { enricherAgent } from '@/lib/agents/enricher';
 import { strategistAgent, analyzeBatch } from '@/lib/agents/strategist';
-import { Flight, UserIntent, FilterCriteria, FlightAnalysis } from '@/types';
+import { Flight, UserIntent, FilterCriteria, FlightAnalysis, FilterOptions } from '@/types';
 import { UserIntentSchema } from '@/types/schemas';
 import { searchCache } from '@/lib/utils/cache';
 import { filterFlights, sortFlights, SortOption, extractFilters } from '@/lib/utils/flightFilters';
@@ -11,10 +11,16 @@ import { calculateIntradayMetrics, IntradayMetric } from '@/lib/utils/priceAnaly
 
 export async function orchestrateSearch(formData: FormData): Promise<{
     flights: Flight[],
-    priceHistory?: any[],
-    dictionaries?: any,
-    pagination?: any,
-    filterOptions?: any,
+    priceHistory?: { date: string; price: number; min: number; max: number }[],
+    dictionaries?: FilterOptions['dictionaries'],
+    pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+        limit: number;
+        hasMore: boolean;
+    },
+    filterOptions?: FilterOptions,
     flightAnalysis?: FlightAnalysis,
     intradayMetrics?: IntradayMetric[]
 }> {
@@ -25,8 +31,8 @@ export async function orchestrateSearch(formData: FormData): Promise<{
     const cachedResult = searchCache.get(formData);
 
     let enrichedFlights: Flight[] = [];
-    let priceAnalysis: any[] = [];
-    let dictionaries: any = {};
+    let priceAnalysis: any[] = []; // Keep internal as any for now until Amadeus types are fully mapped, but external is typed
+    let dictionaries: FilterOptions['dictionaries'] = { locations: {} };
 
     if (cachedResult) {
         // CACHE HIT: Skip agents, use memory

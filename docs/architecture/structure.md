@@ -5,43 +5,43 @@ This document outlines the current structure of the Flight Search Engine MVP. Mo
 ## 📱 Mobile View Modules
 *Components that are specifically designed for mobile interfaces or appear exclusively on smaller screens (< 1000px).*
 
-- **[MobileFilterBar.tsx](src/components/search/MobileFilterBar.tsx)**
-  - **Location**: `src/components/search`
+- **[MobileFilterBar.tsx](src/components/search/filters/MobileFilterBar.tsx)**
+  - **Location**: `src/components/search/filters`
   - **Purpose**: A compact sticky bar for mobile users to access filters without taking up screen space. Replaces `FilterSidebar` on screens < 1000px.
-- **[CompactSearchSummary.tsx](src/components/search/CompactSearchSummary.tsx)**
-  - **Location**: `src/components/search`
+- **[CompactSearchSummary.tsx](src/components/search/layout/CompactSearchSummary.tsx)**
+  - **Location**: `src/components/search/layout`
   - **Purpose**: A condensed summary of search criteria (e.g., "LHR - JFK • 26 Jan") shown on mobile results pages inside `SearchFormWrapper`. Tapping it opens the full edit modal.
-- **[SearchFormWrapper.tsx](src/components/search/SearchFormWrapper.tsx)** (Mobile State)
-  - **Location**: `src/components/search`
+- **[SearchFormWrapper.tsx](src/components/search/form/SearchFormWrapper.tsx)** (Mobile State)
+  - **Location**: `src/components/search/form`
   - **Purpose**: Handles the mobile logic for showing the `CompactSearchSummary` and the modal portal for editing the search.
 
 ## 💻 Laptop/Desktop View Modules
 *Components that are active primarily on larger screens (typically > 1000px or > 1300px).*
 
-- **[FilterSidebar.tsx](src/components/search/FilterSidebar.tsx)**
-  - **Location**: `src/components/search`
+- **[FilterSidebar.tsx](src/components/search/filters/FilterSidebar.tsx)**
+  - **Location**: `src/components/search/filters`
   - **Purpose**: The main sidebar containing detailed filters (Price, Airlines, Stops, etc.). Sticky positioned on the left column. Hidden on mobile.
-- **[PriceHistoryGraph.tsx](src/components/visuals/PriceHistoryGraph.tsx)**
-  - **Location**: `src/components/visuals`
+- **[PriceHistoryGraph.tsx](src/components/analytics/PriceHistoryGraph.tsx)**
+  - **Location**: `src/components/analytics`
   - **Purpose**: A large, detailed data visualization of price trends. Located in the right column. Hidden on screens < 1300px.
-- **[AIStrategistPanel.tsx](src/components/dashboard/AIStrategistPanel.tsx)**
-  - **Location**: `src/components/dashboard`
+- **[AIStrategistPanel.tsx](src/components/ai-assistant/AIStrategistPanel.tsx)**
+  - **Location**: `src/components/ai-assistant`
   - **Purpose**: The "AI Assistant" panel that offers insights (BUY/WAIT) and chat functionality. Located in the right column below the graph. Hidden on screens < 1300px.
 
 ## 🔄 Core & Shared Modules
 *Responsive components used across all views or acting as orchestrators.*
 
-- **[SearchResultsLayout.tsx](src/components/search/SearchResultsLayout.tsx)**
-  - **Location**: `src/components/search`
+- **[SearchResultsLayout.tsx](src/components/search/layout/SearchResultsLayout.tsx)**
+  - **Location**: `src/components/search/layout`
   - **Purpose**: The main layout orchestrator. It manages state (filters, sorting, flight stack) and conditionally renders the Mobile or Desktop columns described above.
 - **[BentoFlightCard.tsx](src/components/flight/BentoFlightCard.tsx)**
   - **Location**: `src/components/flight`
   - **Purpose**: The individual flight result card. Highly responsive; adapts its layout from a stacked mobile view to a wide desktop grid row.
-- **[SearchForm.tsx](src/components/search/SearchForm.tsx)**
-  - **Location**: `src/components/search`
+- **[SearchForm.tsx](src/components/search/form/SearchForm.tsx)**
+  - **Location**: `src/components/search/form`
   - **Purpose**: The core form for selecting origin, destination, and dates. Adaptable via `layout="horizontal" | "vertical"`.
-- **[SearchPageHeader.tsx](src/components/search/SearchPageHeader.tsx)**
-  - **Location**: `src/components/search`
+- **[SearchPageHeader.tsx](src/components/search/layout/SearchPageHeader.tsx)**
+  - **Location**: `src/components/search/layout`
   - **Purpose**: The top navigation bar containing the Logo, Theme Toggle, and Search Form (on desktop).
 - **[TrendStrategist.tsx](src/components/home/TrendStrategist.tsx)**
   - **Location**: `src/components/home`

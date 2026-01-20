@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sliders, ChevronDown, ChevronRight } from 'lucide-react';
+import { Sliders } from 'lucide-react';
 import { FilterCriteria, FilterOptions } from '@/types';
-import { FilterSection, SmoothSlider, CountryGroup, toTitleCase } from './FilterShared';
+import { SmoothSlider } from './FilterShared';
 import { TimePriceSlider } from '@/components/ui/TimePriceSlider';
+import { AirlineCheckbox } from './shared/AirlineCheckbox';
+import { StopsCheckbox } from './shared/StopsCheckbox';
+import { AirportGroup } from './shared/AirportGroup';
 import { AIRPORT_DETAILS } from '@/lib/data/airports';
 
 interface FilterSidebarProps {
@@ -61,16 +64,9 @@ export function FilterSidebar({ filters, setFilters, options }: FilterSidebarPro
         return `${h}h ${m}m`;
     };
 
-    /**
-     * Formats minutes from midnight to 12-hour time string (e.g., "2:30 PM")
-     */
-    const formatTime = (minutes: number) => {
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        const h12 = h % 12 || 12;
-        const mStr = m < 10 ? `0${m}` : m;
-        return `${h12}:${mStr} ${ampm}`;
+    // Helper to partial update filters (needed for AirportGroup)
+    const handlePartialUpdate = (updates: Partial<FilterCriteria>) => {
+        setFilters({ ...filters, ...updates });
     };
 
     return (
@@ -110,20 +106,12 @@ export function FilterSidebar({ filters, setFilters, options }: FilterSidebarPro
                     <h4 className="text-sm font-semibold text-slate-300">Stops</h4>
                     <div className="space-y-2">
                         {[0, 1, 2].map((stop: number) => (
-                            <label key={stop} className="flex items-center gap-3 cursor-pointer group">
-                                <div className={`w-4 h-4 rounded border flex items-center justify-center transition ${filters.stops.includes(stop) ? 'bg-sky-500 border-sky-500' : 'border-slate-600 group-hover:border-slate-500'}`}>
-                                    {filters.stops.includes(stop) && <span className="text-[10px] text-white">✓</span>}
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    className="hidden"
-                                    checked={filters.stops.includes(stop)}
-                                    onChange={() => handleStopToggle(stop)}
-                                />
-                                <span className="text-sm text-slate-400 group-hover:text-white transition">
-                                    {stop === 0 ? 'Direct' : stop === 1 ? '1 Stop' : '2+ Stops'}
-                                </span>
-                            </label>
+                            <StopsCheckbox
+                                key={stop}
+                                stopCount={stop}
+                                isSelected={filters.stops.includes(stop)}
+                                onToggle={handleStopToggle}
+                            />
                         ))}
                     </div>
                 </div>
@@ -211,22 +199,22 @@ export function FilterSidebar({ filters, setFilters, options }: FilterSidebarPro
                                 return (
                                     <>
                                         {countries.map((country: string) => (
-                                            <CountryGroup
+                                            <AirportGroup
                                                 key={country}
                                                 country={country}
                                                 codes={grouped[country]}
                                                 filters={filters}
-                                                setFilters={setFilters}
+                                                onUpdate={handlePartialUpdate}
                                                 options={options}
                                             />
                                         ))}
 
                                         {unknown.length > 0 && (
-                                            <CountryGroup
+                                            <AirportGroup
                                                 country="Other Regions"
                                                 codes={unknown}
                                                 filters={filters}
-                                                setFilters={setFilters}
+                                                onUpdate={handlePartialUpdate}
                                                 options={options}
                                             />
                                         )}
@@ -242,33 +230,13 @@ export function FilterSidebar({ filters, setFilters, options }: FilterSidebarPro
                     <h4 className="text-sm font-semibold text-slate-300">Airlines</h4>
                     <div className="space-y-2">
                         {(options.airlines || []).map((airline: string) => (
-                            <label key={airline} className="flex items-center gap-3 cursor-pointer group">
-                                <div className={`w-4 h-4 rounded border flex items-center justify-center transition ${filters.airlines.includes(airline) ? 'bg-sky-500 border-sky-500' : 'border-slate-600 group-hover:border-slate-500'}`}>
-                                    {filters.airlines.includes(airline) && <span className="text-[10px] text-white">✓</span>}
-                                </div>
-                                <input
-                                    type="checkbox"
-                                    className="hidden"
-                                    checked={filters.airlines.includes(airline)}
-                                    onChange={() => handleAirlineToggle(airline)}
-                                />
-                                <span className="text-sm text-slate-400 group-hover:text-white transition truncate max-w-[180px]" title={airline}>
-                                    {(() => {
-                                        // Amadeus returns 'carriers', not 'airlines' in dictionaries. We check both just in case.
-                                        // @ts-ignore
-                                        const entry = options.dictionaries?.carriers?.[airline] || options.dictionaries?.airlines?.[airline];
-                                        let name = entry || airline;
-
-                                        // Title Case
-                                        if (name) {
-                                            name = toTitleCase(name);
-                                            const display = `${name} (${airline})`;
-                                            return display.length > 25 ? display.slice(0, 25) + '...' : display;
-                                        }
-                                        return airline;
-                                    })()}
-                                </span>
-                            </label>
+                            <AirlineCheckbox
+                                key={airline}
+                                airlineCode={airline}
+                                isSelected={filters.airlines.includes(airline)}
+                                onToggle={handleAirlineToggle}
+                                dictionaries={options.dictionaries}
+                            />
                         ))}
                     </div>
                 </div>

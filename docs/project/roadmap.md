@@ -240,14 +240,12 @@ SkySpeed Neo follows a phased approach to feature development, prioritizing core
 
 ## Versioning
 
-### Current Version: v1.1.2 (Search UI Optimization)
-- **Mobile UI Polish**: Optimized landing page search form for mobile devices.
-- **True Server-Side Pagination & Filtering**
-- **Dual-Layer Caching Strategy**
-- Core flight search functionality
-- Advanced filtering
-- AI recommendations
-- Price analytics
+### Current Version: v1.1.4 (Mobile & Polish)
+- **Mobile Filter Sync**: Unified logic between desktop sidebar and mobile bottom sheet.
+- **Console Cleanliness**: Resolved viewport metadata deprecations and Recharts warnings.
+- **Type Safety**: Enforced strict typing across search engine core.
+- **Core Search Engine**: v1.1.0 Feature set (Server-side orchestration)
+- **Advanced Filtering**: Full parity between mobile/desktop.
 
 ### Planned Versions
 - **v1.2**: Production API migration

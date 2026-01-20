@@ -180,8 +180,12 @@ export interface FilterOptions {
     departureHistogram?: number[];
     arrivalHistogram?: number[];
     dictionaries?: {
-        airlines: Record<string, string>;
+        // Amadeus sometimes uses 'carriers', sometimes 'airlines'. We support both in the type
+        airlines?: Record<string, string>;
+        carriers?: Record<string, string>;
         locations: Record<string, string>;
+        aircraft?: Record<string, string>;
+        currencies?: Record<string, string>;
     };
 }
 

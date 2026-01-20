@@ -5,10 +5,18 @@ All notable changes to SkySpeed Neo will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.4] - 2026-01-21
 
-### Added
-- Documentation reorganization into categorized structure
+### Refactored
+- **Filter Components**: Unified filtering logic by extracting shared components (`AirlineCheckbox`, `StopsCheckbox`, `AirportGroup`) to reducing code duplication.
+- **Mobile & Desktop Sync**: Synchronized core logic between `FilterSidebar` and `MobileFilterBar` while strictly maintaining platform-specific interactions (Live vs Draft state).
+
+### Fixed
+- **Type Safety**: Removed `any` types from `swarm-engine` and hardened `FilterOptions` with strict dictionary definitions.
+- **Dead Code**: Removed unused legacy components from `FilterShared.tsx`.
+- **Console Warnings**:
+  - Fixed Next.js `viewport` metadata deprecation warning in `/search/page.tsx`.
+  - Resolved Recharts `width`/`height` invalid value warnings in `PriceHistoryGraph.tsx`.
 
 ## [1.1.3] - 2026-01-20
 
