@@ -79,9 +79,9 @@ export function TravellersSelector({ initialPax = "1", initialClass = "ECONOMY",
 
     const displayClass = CABIN_CLASSES.find(c => c.value === selectedClass)?.label || selectedClass;
 
-    const SelectorContent = () => (
+    const SelectorContent = ({ isMobile }: { isMobile: boolean }) => (
         <div className={`bg-[#1a1a24] border border-white/10 rounded-2xl shadow-2xl p-4 overflow-hidden 
-            ${mobileView ? 'w-[320px] max-w-[90vw]' : 'w-[320px]'}
+            ${isMobile ? 'w-[320px] max-w-[90vw]' : 'w-[320px]'}
         `}>
             {/* Review: Travelers Header */}
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Travelers</div>
@@ -193,7 +193,7 @@ export function TravellersSelector({ initialPax = "1", initialClass = "ECONOMY",
                                         exit={{ scale: 0.9, y: 20 }}
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <SelectorContent />
+                                        <SelectorContent isMobile={true} />
                                     </motion.div>
                                 </motion.div>,
                                 document.body
@@ -207,7 +207,7 @@ export function TravellersSelector({ initialPax = "1", initialClass = "ECONOMY",
                                     transition={{ duration: 0.1 }}
                                     className="absolute top-[calc(100%+8px)] right-0 z-50"
                                 >
-                                    <SelectorContent />
+                                    <SelectorContent isMobile={false} />
                                 </motion.div>
                             )
                         )}

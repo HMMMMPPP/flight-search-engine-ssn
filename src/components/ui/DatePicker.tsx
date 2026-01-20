@@ -122,10 +122,10 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
     };
 
     // Calendar Content Component to avoid duplication
-    const CalendarContent = () => (
+    const CalendarContent = ({ isMobile }: { isMobile: boolean }) => (
         <div className={`
              bg-[#1a1a24] border border-white/10 rounded-2xl shadow-2xl p-4
-             ${mobileView ? 'w-[300px]' : 'w-[280px]'}
+             ${isMobile ? 'w-[300px]' : 'w-[280px]'}
         `}>
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
@@ -182,47 +182,44 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
             {/* Popover */}
             <AnimatePresence>
                 {isOpen && (
-                    <>
-                        {mobileView && mounted ? (
-                            // Mobile Modal via Portal
-                            createPortal(
+                    mobileView && mounted ? (
+                        // Mobile Modal via Portal
+                        createPortal(
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                                onClick={() => setIsOpen(false)}
+                            >
                                 <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                                    onClick={() => setIsOpen(false)}
+                                    initial={{ scale: 0.9, y: 20 }}
+                                    animate={{ scale: 1, y: 0 }}
+                                    exit={{ scale: 0.9, y: 20 }}
+                                    onClick={(e) => e.stopPropagation()}
                                 >
-                                    <motion.div
-                                        initial={{ scale: 0.9, y: 20 }}
-                                        animate={{ scale: 1, y: 0 }}
-                                        exit={{ scale: 0.9, y: 20 }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <CalendarContent />
-                                    </motion.div>
-                                </motion.div>,
-                                document.body
-                            )
-                        ) : (
-                            // Desktop Dropdown
-                            !mobileView && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                    transition={{ duration: 0.15, ease: "easeOut" }}
-                                    className="absolute top-[calc(100%+8px)] left-0 z-50"
-                                >
-                                    <CalendarContent />
+                                    <CalendarContent isMobile={true} />
                                 </motion.div>
-                            )
-                        )}
-                    </>
+                            </motion.div>,
+                            document.body
+                        )
+                    ) : (
+                        // Desktop Dropdown
+                        !mobileView && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="absolute top-[calc(100%+8px)] left-0 z-50"
+                            >
+                                <CalendarContent isMobile={false} />
+                            </motion.div>
+                        )
+                    )
                 )}
             </AnimatePresence>
         </div>
     );
 }
-
 
