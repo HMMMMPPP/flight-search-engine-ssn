@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Users, ChevronDown, Minus, Plus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface TravellersSelectorProps {
     initialPax?: string;
@@ -160,7 +159,7 @@ export function TravellersSelector({ initialPax = "1", initialClass = "ECONOMY",
             >
                 <div className="flex items-center gap-2 text-white">
                     <Users size={16} className="text-slate-400" />
-                    <span className="text-sm font-medium">
+                    <span suppressHydrationWarning className="text-sm font-medium">
                         {totalPax} Traveler{totalPax !== 1 ? 's' : ''}, {displayClass === 'Premium Economy' ? 'Prem. Eco' : displayClass}
                     </span>
                 </div>
@@ -175,45 +174,34 @@ export function TravellersSelector({ initialPax = "1", initialClass = "ECONOMY",
             <input type="hidden" name="cabinClass" value={selectedClass} />
 
             {/* Popover */}
-            <AnimatePresence>
-                {isOpen && (
-                    <>
-                        {mobileView && mounted ? (
-                            createPortal(
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                                    onClick={() => setIsOpen(false)}
+            {isOpen && (
+                <>
+                    {mobileView && mounted ? (
+                        createPortal(
+                            <div
+                                className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="transform scale-100"
                                 >
-                                    <motion.div
-                                        initial={{ scale: 0.9, y: 20 }}
-                                        animate={{ scale: 1, y: 0 }}
-                                        exit={{ scale: 0.9, y: 20 }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <SelectorContent isMobile={true} />
-                                    </motion.div>
-                                </motion.div>,
-                                document.body
-                            )
-                        ) : (
-                            !mobileView && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                    transition={{ duration: 0.1 }}
-                                    className="absolute top-[calc(100%+8px)] right-0 z-50"
-                                >
-                                    <SelectorContent isMobile={false} />
-                                </motion.div>
-                            )
-                        )}
-                    </>
-                )}
-            </AnimatePresence>
+                                    <SelectorContent isMobile={true} />
+                                </div>
+                            </div>,
+                            document.body
+                        )
+                    ) : (
+                        !mobileView && (
+                            <div
+                                className="absolute top-[calc(100%+8px)] right-0 z-50 animate-in fade-in slide-in-from-top-2 duration-150"
+                            >
+                                <SelectorContent isMobile={false} />
+                            </div>
+                        )
+                    )}
+                </>
+            )}
         </div>
     );
 }

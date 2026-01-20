@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.1.3] - 2026-01-20
+
+### Fixed
+- **Mobile Search Form Visibility**: Fixed critical issue where `DatePicker` and `TravellersSelector` were not appearing on mobile devices.
+  - Replaced `framer-motion` modals with `z-[9999]` fixed positioning to resolve stacking context conflicts.
+  - Converted form triggers from `div` to `button` for improved accessibility and touch handling.
+  - Resolved `ReferenceError` crashes in `TravellersSelector` caused by missing React imports.
+- **Hydration Mismatches**: Fixed server/client hydration errors by adding `suppressHydrationWarning` to date-dependent text nodes.
+
 ## [1.1.2] - 2026-01-20
 
 ### Fixed

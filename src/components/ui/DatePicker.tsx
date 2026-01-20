@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+// Removed framer-motion to simplify debugging
+// import { motion, AnimatePresence } from 'framer-motion';
 import { MONTH_NAMES, DAYS_SHORT, getDaysInMonth, getFirstDayOfMonth, addMonths, isSameDay, isToday, formatDateISO, formatDate, isBeforeDate } from '@/lib/utils/date';
 
 interface DatePickerProps {
@@ -19,7 +20,19 @@ interface DatePickerProps {
 export function DatePicker({ value, onChange, placeholder = 'Select Date', minDate, className = '', mobileView = false }: DatePickerProps) {
 
     const [isOpen, setIsOpen] = useState(false);
-    const [currentMonth, setCurrentMonth] = useState(new Date());
+
+
+    // Initialize with specific date or handle via effect to avoid hydration mismatch
+    const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
+
+    useEffect(() => {
+        if (!currentMonth) {
+            setCurrentMonth(value ? new Date(value) : new Date());
+        }
+    }, [value, currentMonth]);
+
+    // Fallback for render safe check
+    const displayMonth = currentMonth || new Date();
     const wrapperRef = useRef<HTMLDivElement>(null);
 
     // Parse value or default to today for calendar view
@@ -38,7 +51,8 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
                 // Correction: If current view is in the past relative to minDate, jump to minDate
                 const [y, m] = minDate.split('-').map(Number);
                 const min = new Date(y, m - 1);
-                if (currentMonth < min) {
+                // use displayMonth or check if currentMonth is set to avoid null error
+                if (currentMonth && currentMonth < min) {
                     setCurrentMonth(min);
                 }
             }
@@ -65,11 +79,11 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [mobileView]);
 
-    const handlePrevMonth = () => setCurrentMonth(prev => addMonths(prev, -1));
-    const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev, 1));
+    const handlePrevMonth = () => setCurrentMonth(prev => addMonths(prev || new Date(), -1));
+    const handleNextMonth = () => setCurrentMonth(prev => addMonths(prev || new Date(), 1));
 
     const handleDayClick = (day: number) => {
-        const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+        const date = new Date(displayMonth.getFullYear(), displayMonth.getMonth(), day);
 
         // Use logic function to prevent unavailable dates
         if (isBeforeDate(date, minDate)) return;
@@ -80,8 +94,8 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
     };
 
     const generateDays = () => {
-        const year = currentMonth.getFullYear();
-        const month = currentMonth.getMonth();
+        const year = displayMonth.getFullYear();
+        const month = displayMonth.getMonth();
         const daysInMonth = getDaysInMonth(month, year);
         const firstDay = getFirstDayOfMonth(month, year); // 0 = Sunday
 
@@ -130,7 +144,7 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <span className="text-white font-bold text-sm pl-1">
-                    {MONTH_NAMES[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                    {MONTH_NAMES[displayMonth.getMonth()]} {displayMonth.getFullYear()}
                 </span>
                 <div className="flex gap-1">
                     <button type="button" onClick={handlePrevMonth} className="p-1 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition">
@@ -161,10 +175,14 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
     return (
         <div className={`relative ${className}`} ref={wrapperRef}>
             {/* Display Input Trigger */}
-            <div
-                onClick={() => setIsOpen(!isOpen)}
+            {/* Display Input Trigger */}
+            <button
+                type="button"
+                onClick={() => {
+                    setIsOpen(!isOpen);
+                }}
                 className={`
-                    w-full h-[52px] bg-white/5 border rounded-xl flex items-center pl-10 pr-3 cursor-pointer transition-all group
+                    w-full h-[52px] bg-white/5 border rounded-xl flex items-center pl-10 pr-3 cursor-pointer transition-all group outline-none
                     ${isOpen ? 'border-sky-500/50 bg-white/10' : 'border-white/10 hover:border-white/20'}
                 `}
             >
@@ -174,51 +192,40 @@ export function DatePicker({ value, onChange, placeholder = 'Select Date', minDa
                     className={`absolute left-3 transition-colors ${isOpen ? 'text-sky-400' : 'text-slate-400 group-hover:text-slate-300'}`}
                 />
 
-                <span className={`text-sm ${value ? 'text-white font-medium' : 'text-slate-500'}`}>
+                <span suppressHydrationWarning className={`text-sm ${value ? 'text-white font-medium' : 'text-slate-500'}`}>
                     {value ? formatDate(value) : placeholder}
                 </span>
-            </div>
+            </button>
 
             {/* Popover */}
-            <AnimatePresence>
-                {isOpen && (
-                    mobileView && mounted ? (
-                        // Mobile Modal via Portal
-                        createPortal(
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                                onClick={() => setIsOpen(false)}
+            {isOpen && (
+                mobileView && mounted ? (
+                    // Mobile Modal via Portal
+                    createPortal(
+                        <div
+                            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            <div
+                                onClick={(e) => e.stopPropagation()}
+                                className="transform scale-100"
                             >
-                                <motion.div
-                                    initial={{ scale: 0.9, y: 20 }}
-                                    animate={{ scale: 1, y: 0 }}
-                                    exit={{ scale: 0.9, y: 20 }}
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <CalendarContent isMobile={true} />
-                                </motion.div>
-                            </motion.div>,
-                            document.body
-                        )
-                    ) : (
-                        // Desktop Dropdown
-                        !mobileView && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                                transition={{ duration: 0.15, ease: "easeOut" }}
-                                className="absolute top-[calc(100%+8px)] left-0 z-50"
-                            >
-                                <CalendarContent isMobile={false} />
-                            </motion.div>
-                        )
+                                <CalendarContent isMobile={true} />
+                            </div>
+                        </div>,
+                        document.body
                     )
-                )}
-            </AnimatePresence>
+                ) : (
+                    // Desktop Dropdown
+                    !mobileView && (
+                        <div
+                            className="absolute top-[calc(100%+8px)] left-0 z-50 animate-in fade-in zoom-in-95 duration-150"
+                        >
+                            <CalendarContent isMobile={false} />
+                        </div>
+                    )
+                )
+            )}
         </div>
     );
 }

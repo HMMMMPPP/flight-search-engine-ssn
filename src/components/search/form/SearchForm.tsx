@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Search, Calendar, MapPin, Plane, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -40,7 +42,11 @@ interface SearchFormProps {
  * - Submits via native FormData for Server Actions
  */
 export function SearchForm({ onSearch, isPending, initialValues, layout = 'horizontal' }: SearchFormProps) {
-    const today = formatDateISO(new Date());
+    const [today, setToday] = useState('');
+
+    useEffect(() => {
+        setToday(formatDateISO(new Date()));
+    }, []);
 
     const [date, setDate] = useState(initialValues?.date || '');
     const [returnDate, setReturnDate] = useState(initialValues?.returnDate || '');
@@ -63,9 +69,7 @@ export function SearchForm({ onSearch, isPending, initialValues, layout = 'horiz
     const isVertical = layout === 'vertical';
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+        <div
             className={`w-full relative z-10 flex items-center gap-3 ${isVertical ? 'flex-col' : ''}`}
         >
             <form
@@ -187,6 +191,6 @@ export function SearchForm({ onSearch, isPending, initialValues, layout = 'horiz
                 </div>
             </form>
 
-        </motion.div>
+        </div>
     );
 }
