@@ -1,3 +1,4 @@
+import { SortOption } from '@/lib/utils/flightFilters';
 import { orchestrateSearch } from '@/features/orchestrator/swarm-engine';
 import Link from 'next/link';
 import { SearchResultsLayout } from '@/components/search/layout/SearchResultsLayout';
@@ -29,6 +30,12 @@ export default async function SearchPage({
     const airlines = resolvedParams.airlines as string;
     const stops = resolvedParams.stops as string;
     const maxDuration = resolvedParams.maxDuration as string;
+
+    // Validate Sort Option to satisfy TypeScript union type
+    const validSortOptions: SortOption[] = ['best', 'duration_asc', 'departure_asc', 'departure_desc'];
+    const safeSort: SortOption = validSortOptions.includes(sort as SortOption)
+        ? (sort as SortOption)
+        : 'best';
 
     // Execute Search Server-Side
     const formData = new FormData();
@@ -86,7 +93,7 @@ export default async function SearchPage({
                 // Server-Side Orchestration Props
                 filterOptions={filterOptions}
                 activeFilters={currentFilters}
-                sortBy={sort || 'best'}
+                sortBy={safeSort}
             />
 
         </main>
