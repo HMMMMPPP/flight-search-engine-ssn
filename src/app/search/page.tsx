@@ -20,6 +20,15 @@ export default async function SearchPage({
     const pax = resolvedParams.pax as string;
     const cabinClass = resolvedParams.cabinClass as string;
     const currency = resolvedParams.currency as string;
+    const limit = resolvedParams.limit ? parseInt(resolvedParams.limit as string, 10) : 10;
+    const page = resolvedParams.page ? parseInt(resolvedParams.page as string, 10) : 1;
+
+    // Filters & Sort
+    const sort = resolvedParams.sort as string;
+    const maxPrice = resolvedParams.maxPrice as string;
+    const airlines = resolvedParams.airlines as string;
+    const stops = resolvedParams.stops as string;
+    const maxDuration = resolvedParams.maxDuration as string;
 
     // Execute Search Server-Side
     const formData = new FormData();
@@ -30,9 +39,24 @@ export default async function SearchPage({
     if (pax) formData.append('pax', pax);
     if (cabinClass) formData.append('cabinClass', cabinClass);
     if (currency) formData.append('currency', currency);
+    formData.append('limit', limit.toString());
+    formData.append('page', page.toString());
+
+    if (sort) formData.append('sort', sort);
+    if (maxPrice) formData.append('maxPrice', maxPrice);
+    if (airlines) formData.append('airlines', airlines);
+    if (stops) formData.append('stops', stops);
+    if (maxDuration) formData.append('maxDuration', maxDuration);
 
     // Use orchestrateSearch directly (server-to-server)
-    const { flights, priceHistory, dictionaries } = await orchestrateSearch(formData);
+    const { flights, priceHistory, dictionaries, pagination, filterOptions } = await orchestrateSearch(formData);
+
+    const currentFilters = {
+        maxPrice: maxPrice ? parseFloat(maxPrice) : (filterOptions?.maxPrice || 10000),
+        airlines: airlines ? airlines.split(',').filter(Boolean) : [],
+        stops: stops ? stops.split(',').map(Number) : [],
+        maxDuration: maxDuration ? parseInt(maxDuration, 10) : undefined,
+    };
 
     return (
         <main className="min-h-screen relative text-slate-200 font-sans selection:bg-sky-500/30 bg-[#0a0a12]">
@@ -58,6 +82,11 @@ export default async function SearchPage({
                 dictionaries={dictionaries}
                 selectedDate={date}
                 returnDate={returnDate}
+                pagination={pagination}
+                // Server-Side Orchestration Props
+                filterOptions={filterOptions}
+                activeFilters={currentFilters}
+                sortBy={sort || 'best'}
             />
 
         </main>

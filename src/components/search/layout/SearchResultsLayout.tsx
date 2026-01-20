@@ -1,17 +1,19 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Flight, PriceMetrics, FilterCriteria } from '@/types';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Flight, PriceMetrics, FilterCriteria, FilterOptions } from '@/types';
 import { FilterSidebar } from '@/components/search/filters/FilterSidebar';
 import { BentoFlightCard } from '@/components/flight/BentoFlightCard';
 import { PriceHistoryGraph } from '@/components/analytics/PriceHistoryGraph';
 import { AIStrategistPanel } from '@/components/ai-assistant/AIStrategistPanel';
 import { MobileFilterBar } from '@/components/search/filters/MobileFilterBar';
 import { motion, AnimatePresence } from 'framer-motion';
-import { extractFilters, filterFlights, parseDuration } from '@/lib/utils/flightFilters';
+import { SortOption } from '@/lib/utils/flightFilters';
 import { analyzeBatch } from '@/lib/agents/strategist';
 import { TrendingDown } from 'lucide-react';
 import clsx from 'clsx';
+import { PaginationControls } from '@/components/ui/PaginationControls';
 
 interface SearchResultsLayoutProps {
     initialFlights: Flight[];
@@ -19,28 +21,91 @@ interface SearchResultsLayoutProps {
     dictionaries?: any;
     selectedDate?: string;
     returnDate?: string;
+    pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalCount: number;
+        limit: number;
+        hasMore: boolean;
+    };
+    filterOptions: FilterOptions;
+    activeFilters: FilterCriteria;
+    sortBy: SortOption;
 }
 
-export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries, selectedDate, returnDate }: SearchResultsLayoutProps) {
-
-    // 1. Extract potential filter options from the full dataset
-    const filterOptions = useMemo(() => {
-        const options = extractFilters(initialFlights);
-        return { ...options, dictionaries };
-    }, [initialFlights, dictionaries]);
-
-    // 2. Filter State
-    const [filters, setFilters] = useState<FilterCriteria>({
-        maxPrice: filterOptions.maxPrice,
-        airlines: [],
-        stops: [],
-        maxDuration: undefined
-    });
+export function SearchResultsLayout({
+    initialFlights,
+    priceHistory,
+    dictionaries,
+    selectedDate,
+    returnDate,
+    pagination,
+    filterOptions,
+    activeFilters,
+    sortBy
+}: SearchResultsLayoutProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     // Sorting State
-    type SortOption = 'best' | 'duration_asc' | 'departure_asc' | 'departure_desc';
-    const [sortBy, setSortBy] = useState<SortOption>('best');
     const [isSortOpen, setIsSortOpen] = useState(false);
+
+    // Update Filters (URL-Driven)
+    const updateFilters = (newFilters: FilterCriteria) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        // Update Max Price
+        if (newFilters.maxPrice && newFilters.maxPrice < 100000) {
+            params.set('maxPrice', newFilters.maxPrice.toString());
+        } else {
+            params.delete('maxPrice');
+        }
+
+        // Update Airlines
+        if (newFilters.airlines && newFilters.airlines.length > 0) {
+            params.set('airlines', newFilters.airlines.join(','));
+        } else {
+            params.delete('airlines');
+        }
+
+        // Update Stops
+        if (newFilters.stops && newFilters.stops.length > 0) {
+            params.set('stops', newFilters.stops.join(','));
+        } else {
+            params.delete('stops');
+        }
+
+        // Update Duration
+        if (newFilters.maxDuration) {
+            params.set('maxDuration', newFilters.maxDuration.toString());
+        } else {
+            params.delete('maxDuration');
+        }
+
+        // Reset Page to 1 on filter change
+        params.set('page', '1');
+
+        router.replace(`/search?${params.toString()}`, { scroll: false });
+    };
+
+    // Functional State Setter Adapter for Child Components
+    const setFiltersAdapter = (update: FilterCriteria | ((prev: FilterCriteria) => FilterCriteria)) => {
+        let nextFilters: FilterCriteria;
+        if (typeof update === 'function') {
+            nextFilters = update(activeFilters);
+        } else {
+            nextFilters = update;
+        }
+        updateFilters(nextFilters);
+    };
+
+    const handleSortChange = (newSort: SortOption) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('sort', newSort);
+        params.set('page', '1'); // Reset page on sort
+        router.replace(`/search?${params.toString()}`, { scroll: false });
+        setIsSortOpen(false);
+    };
 
     // Sort Options Map for UI
     const sortOptions: { label: string; value: SortOption }[] = [
@@ -49,22 +114,6 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
         { label: 'Earliest Departure', value: 'departure_asc' },
         { label: 'Latest Departure', value: 'departure_desc' },
     ];
-
-    // Helper: Sort Logic
-    const sortFlights = (flights: Flight[], sort: SortOption) => {
-        const sorted = [...flights];
-        switch (sort) {
-            case 'best':
-            default: // Default: Best Match = Cheapest (Price Ascending)
-                return sorted.sort((a, b) => a.price - b.price);
-            case 'duration_asc':
-                return sorted.sort((a, b) => parseDuration(a.duration) - parseDuration(b.duration));
-            case 'departure_asc':
-                return sorted.sort((a, b) => new Date(a.departure.time).getTime() - new Date(b.departure.time).getTime());
-            case 'departure_desc':
-                return sorted.sort((a, b) => new Date(b.departure.time).getTime() - new Date(a.departure.time).getTime());
-        }
-    };
 
     // Flight Selection Stack (LIFO for Virtual Monitor)
     const [expandedFlightIds, setExpandedFlightIds] = useState<string[]>([]);
@@ -92,32 +141,13 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
         });
     };
 
-    // Reset filters when options change (new search)
-    // Reset filters when options change (new search context)
-    useMemo(() => {
-        // We use useMemo as a side-effect trigger here or better, useEffect.
-        // But better to just reset state if the options ID changes? 
-        // actually, let's just use the useEffect intended.
-    }, []);
-
-    // Reset filters when a new search is performed
+    // Reset selection when flights change (new search or filters)
     useEffect(() => {
-        setFilters({
-            maxPrice: filterOptions.maxPrice,
-            airlines: [],
-            stops: [],
-            maxDuration: undefined,
-            departureWindow: undefined,
-            arrivalWindow: undefined
-        });
-        setExpandedFlightIds([]); // Clear selection on new search
-    }, [initialFlights, filterOptions.maxPrice]); // specific deps to avoid loops
+        setExpandedFlightIds([]);
+    }, [initialFlights]);
 
-    // 3. Apply Filters & Sorting
-    const filteredFlights = useMemo(() => {
-        const filtered = filterFlights(initialFlights, filters);
-        return sortFlights(filtered, sortBy);
-    }, [initialFlights, filters, sortBy]);
+    // Use Server-Provided Flights directly
+    const filteredFlights = initialFlights;
 
     // 4. AI Command Handler
     const handleAICommand = (action: any) => {
@@ -132,21 +162,18 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                 sanitizedCriteria.stops = [sanitizedCriteria.stops];
             }
 
-            setFilters(prev => ({
+            setFiltersAdapter(prev => ({
                 ...prev,
                 ...sanitizedCriteria
             }));
         } else if (action.type === 'SORT') {
-            // Placeholder: sorting is handled by URL params or client-side sort
-            // For now, we'll just log or maybe set a state if we had a sort state
-            console.log("AI Sort Request:", action.sortBy);
+            handleSortChange(action.sortBy as SortOption);
         } else if (action.type === 'RESCUE') {
-            // Placeholder for Rescue logic (e.g., date shift)
             console.log("AI Rescue Request:", action.strategy);
         }
     };
 
-    // 4.5. Flight Analysis Context (Lifted from Panel for shared use)
+    // 4.5. Flight Analysis Context
     const flightAnalysis = useMemo(() => {
         if (!filteredFlights || filteredFlights.length === 0) return null;
         return analyzeBatch(filteredFlights, priceHistory);
@@ -154,23 +181,15 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
 
     // 5. Price Point Handler
     const handlePricePointSelect = (flightId: string) => {
-        // Find flight
         const targetFlight = initialFlights.find(f => f.id === flightId);
         if (!targetFlight) return;
 
-        // 1. Open it (add to stack)
-        // Force open to ensure it activates in the Strategist Panel
         handleFlightToggle(targetFlight, true);
 
-        // 2. Scroll to it (Put on Top)
         setTimeout(() => {
             const element = document.getElementById(`flight-card-${flightId}`);
             if (element) {
-                // block: 'start' aligns the top of the element with the top of the visible area
-                // smooth scrolling for better UX
                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                // Optional: visual cue
                 element.classList.add('ring-2', 'ring-emerald-500/50');
                 setTimeout(() => element.classList.remove('ring-2', 'ring-emerald-500/50'), 2000);
             }
@@ -185,8 +204,8 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                 <div className="hidden min-[1000px]:block min-[1000px]:col-span-3 min-[1300px]:col-span-2">
                     <div className="sticky top-24">
                         <FilterSidebar
-                            filters={filters}
-                            setFilters={setFilters}
+                            filters={activeFilters}
+                            setFilters={setFiltersAdapter}
                             options={filterOptions}
                         />
                     </div>
@@ -198,8 +217,8 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                     {/* Mobile Filters (< 1000px) */}
                     <div className="block min-[1000px]:hidden">
                         <MobileFilterBar
-                            filters={filters}
-                            setFilters={setFilters}
+                            filters={activeFilters}
+                            setFilters={setFiltersAdapter}
                             options={filterOptions}
                         />
                     </div>
@@ -207,7 +226,7 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                     {/* Header with Sort Dropdown */}
                     <div className="flex justify-between items-center mb-4 px-2 relative z-20">
                         <h2 className="text-xl font-bold text-white">
-                            {filteredFlights.length} Flights Found
+                            {pagination ? pagination.totalCount : filteredFlights.length} Flights Found
                         </h2>
 
                         {/* Sort Dropdown */}
@@ -236,10 +255,7 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                                         {sortOptions.map((option) => (
                                             <button
                                                 key={option.value}
-                                                onClick={() => {
-                                                    setSortBy(option.value);
-                                                    setIsSortOpen(false);
-                                                }}
+                                                onClick={() => handleSortChange(option.value)}
                                                 className={clsx(
                                                     "w-full text-left px-4 py-2.5 text-sm transition-colors",
                                                     sortBy === option.value
@@ -263,18 +279,29 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                                 No flights match your filters.
                             </div>
                         ) : (
-                            filteredFlights.map((flight, index) => (
-                                <BentoFlightCard
-                                    key={flight.id}
-                                    id={`flight-card-${flight.id}`}
-                                    flight={flight}
-                                    index={index}
-                                    dictionaries={dictionaries}
-                                    onToggle={(isOpen) => handleFlightToggle(flight, isOpen)}
-                                    // Pass calculated analysis context for consistent recommendations
-                                    batchAnalysis={flightAnalysis}
-                                />
-                            ))
+                            <>
+                                {filteredFlights.map((flight, index) => (
+                                    <BentoFlightCard
+                                        key={flight.id}
+                                        id={`flight-card-${flight.id}`}
+                                        flight={flight}
+                                        index={index}
+                                        dictionaries={dictionaries}
+                                        onToggle={(isOpen) => handleFlightToggle(flight, isOpen)}
+                                        // Pass calculated analysis context for consistent recommendations
+                                        batchAnalysis={flightAnalysis}
+                                    />
+                                ))}
+
+                                {/* Pagination Controls */}
+                                {pagination && pagination.totalPages > 1 && (
+                                    <PaginationControls
+                                        currentPage={pagination.currentPage}
+                                        totalPages={pagination.totalPages}
+                                        baseUrl="/search"
+                                    />
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
@@ -294,11 +321,10 @@ export function SearchResultsLayout({ initialFlights, priceHistory, dictionaries
                         {/* AI Strategist (Replaces Alerts) */}
                         <AIStrategistPanel
                             flights={filteredFlights}
-                            currentFilters={filters}
+                            currentFilters={activeFilters}
                             onCommand={handleAICommand}
                             selectedFlight={activeFlight}
                             priceHistory={priceHistory}
-                            // Pass the already calculated analysis
                             preCalculatedAnalysis={flightAnalysis}
                         />
                     </div>

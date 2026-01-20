@@ -10,6 +10,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.1.0] - 2026-01-20
+
+### Added
+- **Server-Side Orchestration**: All filtering and sorting logic moved to the server (`swarm-engine`).
+- **Global Sorting**: "Sort by" now sorts the entire dataset before pagination (e.g., sort by price affects all 100+ flights, not just the visible 10).
+- **Global Filtering**: Filters (Price, Duration) apply to the full dataset on the server.
+- **Dynamic Facets**: Filter options (e.g., available airlines, price range) are dynamically calculated based on the search context.
+- **Server-Side Caching**: Implemented in-memory caching for instant pagination and filter updates.
+
+### Changed
+- **URL-Driven State**: Refactored `SearchResultsLayout` to be stateless; all state is now managed via URL parameters for deep-linking support.
+- **Pagination Logic**: Moved from "Visual Pagination" to "True Server Pagination" with numbered pages.
+
+## [1.0.5] - 2026-01-20
+
+### Added
+- Client-side pagination for search results (Load More functionality)
+- Initial render limit of 10 flights for improved performance
+
 ## [1.0.4] - 2026-01-20
 
 ### Changed

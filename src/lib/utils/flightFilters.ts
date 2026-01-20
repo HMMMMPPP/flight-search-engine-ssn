@@ -181,3 +181,20 @@ function getMinutesFromDate(isoString: string): number {
         return date.getHours() * 60 + date.getMinutes();
     }
 }
+
+export type SortOption = 'best' | 'duration_asc' | 'departure_asc' | 'departure_desc';
+
+export function sortFlights(flights: Flight[], sort: SortOption): Flight[] {
+    const sorted = [...flights];
+    switch (sort) {
+        case 'best':
+        default: // Default: Best Match = Cheapest (Price Ascending)
+            return sorted.sort((a, b) => a.price - b.price);
+        case 'duration_asc':
+            return sorted.sort((a, b) => parseDuration(a.duration) - parseDuration(b.duration));
+        case 'departure_asc':
+            return sorted.sort((a, b) => new Date(a.departure.time).getTime() - new Date(b.departure.time).getTime());
+        case 'departure_desc':
+            return sorted.sort((a, b) => new Date(b.departure.time).getTime() - new Date(a.departure.time).getTime());
+    }
+}

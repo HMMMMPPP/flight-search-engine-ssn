@@ -2,7 +2,7 @@
 
 ## Overview
 
-To optimize performance and reduce API costs, we have implemented an **In-Memory Caching Strategy** for the Flight Search Engine. This strategy checks for flexible data (like "Cheapest Dates") in a local cache before making expensive calls to external providers like Amadeus.
+To optimize performance and reduce API costs, we have implemented a **Dual-Layer In-Memory Caching Strategy** for the Flight Search Engine. This strategy checks for flexible data (like "Cheapest Dates") and full search results in local caches to provide instant feedback and save quotas.
 
 ## Architecture
 
@@ -30,6 +30,19 @@ if (cachedParams) {
 const response = await apiCall(...);
 cacheService.set(cacheKey, response.data, 3600); // Cache for 1 hour
 ```
+
+### The Search Cache (`src/lib/utils/cache.ts`)
+
+We use a specialized `SearchCache` for the Orchestrator Engine. This caches the **final enriched output** of the agent swarm.
+
+-   **Storage**: `Map<search_hash, SearchResult>`
+-   **Purpose**: Enables **Instant Pagination** and **Instant Filtering**.
+-   **Logic**:
+    1.  User searches (NYC -> LON).
+    2.  Engine runs full swarm (Aggregator -> Enricher -> Strategist).
+    3.  Result is cached.
+    4.  User clicks "Page 2" or "Filter by Price".
+    5.  Engine detects same search parameters (excluding page/filter), hits cache, applies filters/slicing in memory (< 10ms), and returns new view.
 
 ## Configuration
 
