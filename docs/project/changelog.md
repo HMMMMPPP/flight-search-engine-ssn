@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Documentation reorganization into categorized structure
 
+## [1.1.2] - 2026-01-20
+
+### Fixed
+- **Mobile Search Form**: Fixed layout of departure and return date fields to be side-by-side on mobile devices, optimizing vertical space.
+- **Travelers Selector**: Fixed mobile responsiveness of the travelers/class selector popover to prevent overflow on small screens.
+
 ## [1.1.1] - 2026-01-20
 
 ### Performance

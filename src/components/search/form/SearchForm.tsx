@@ -104,7 +104,7 @@ export function SearchForm({ onSearch, isPending, initialValues, layout = 'horiz
                 <div className={`${isVertical ? 'hidden' : 'hidden lg:block'} w-px h-8 bg-white/10 mx-2`} />
 
                 {/* 3. Dates Group */}
-                <div className={`flex items-center gap-2 ${isVertical ? 'flex-col w-full' : ''}`}>
+                <div className={`flex items-center gap-2 ${isVertical ? 'grid grid-cols-2 w-full' : ''}`}>
                     {/* Departure */}
                     <div className={`min-w-[120px] ${isVertical ? 'w-full' : ''}`}>
                         <DatePicker
@@ -112,6 +112,7 @@ export function SearchForm({ onSearch, isPending, initialValues, layout = 'horiz
                             onChange={(d) => setDate(d)}
                             minDate={today}
                             placeholder="Departure"
+                            mobileView={isVertical}
                         />
                     </div>
 
@@ -122,6 +123,7 @@ export function SearchForm({ onSearch, isPending, initialValues, layout = 'horiz
                             onChange={(d) => setReturnDate(d)}
                             minDate={date || today}
                             placeholder="Return"
+                            mobileView={isVertical}
                         />
                         {/* Clear Button (Visible when date is set) */}
                         {returnDate && (
@@ -154,6 +156,7 @@ export function SearchForm({ onSearch, isPending, initialValues, layout = 'horiz
                     <TravellersSelector
                         initialPax={initialValues?.pax}
                         initialClass={initialValues?.cabinClass}
+                        mobileView={isVertical}
                     />
                 </div>
 

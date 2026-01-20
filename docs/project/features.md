@@ -8,7 +8,7 @@ This document tracks the implementation status of features in the SkySpeed fligh
 - **Multi-city Flight Search**: Support for one-way and round-trip flights
 - **Advanced Filtering**: Price range, duration, layovers, departure/arrival times
 - **Real-time Search**: Server-side flight data orchestration powered by Amadeus API
-- **Responsive Design**: Mobile-first UI with desktop optimization
+- **Responsive Design**: Mobile-first UI with desktop optimization and native-like popovers
 
 ### Intelligence & Analysis
 - **AI-Powered Strategist**: Strategic booking advice based on price trends and market analysis

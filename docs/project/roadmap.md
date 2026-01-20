@@ -240,7 +240,8 @@ SkySpeed Neo follows a phased approach to feature development, prioritizing core
 
 ## Versioning
 
-### Current Version: v1.1.0 (Server-Side Orchestration)
+### Current Version: v1.1.2 (Search UI Optimization)
+- **Mobile UI Polish**: Optimized landing page search form for mobile devices.
 - **True Server-Side Pagination & Filtering**
 - **Dual-Layer Caching Strategy**
 - Core flight search functionality

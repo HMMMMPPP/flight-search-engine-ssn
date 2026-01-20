@@ -34,7 +34,7 @@ Established a domain-driven structure to ensure scalability:
 *   **Landing Page**: Hero section with a central `SearchForm`.
 *   **Search Form**:
     *   One-way/Round-trip support.
-    *   Date pickers, Passenger selectors, Class selectors.
+    *   Date pickers, Passenger selectors (Adaptive Mobile Modals), Class selectors.
     *   **Natural Language Input**: "Flights to Paris next weekend under $600".
     *   Seamless transition to `/search` results page with query parameters.
 
