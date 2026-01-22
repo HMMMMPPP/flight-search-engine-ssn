@@ -40,7 +40,7 @@ export default async function LandingPage(props: Props) {
               SkySpeed Neo
             </h1>
             <p className="text-slate-400 text-lg max-w-xl mx-auto">
-              Agentic flight search powered by Amadeus Intelligence.
+              Agentic flight search powered by Duffel API.
             </p>
           </div>
 

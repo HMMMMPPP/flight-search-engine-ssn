@@ -85,7 +85,7 @@ export async function orchestrateSearch(formData: FormData): Promise<{
         // Step 2: Aggregator & Analytics (Parallel)
         const [aggregatorResult, cheapestDates] = await Promise.all([
             aggregatorAgent(intent),
-            amadeusService.getCheapestDates(intent.origin || '', intent.destination || '')
+            Promise.resolve([]) // amadeusService.getCheapestDates is decommissioned
         ]);
 
         const { flights: rawFlights, dictionaries: rawDicts } = aggregatorResult;

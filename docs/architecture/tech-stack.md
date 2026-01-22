@@ -91,20 +91,21 @@ This document details the technology choices and architectural decisions for Sky
 
 ## Flight Data API
 
-### Amadeus Self-Service API
+### Duffel API
 **Flight Search Provider**:
-- Real-time flight availability and pricing
-- Comprehensive airport/city database
-- Trend and analytics endpoints
+- Modern Developer Experience (DX) and robust API
+- Real-time flight offers and booking capabilities
+- Standardized data models across airlines
+- Excellent test environment stability
 
-**API Endpoints Used**:
-- `/shopping/flight-offers` - Flight search
-- `/reference-data/locations` - Airport lookup
-- `/shopping/flight-dates` - Price trends (when available)
+**API Capabilities Used**:
+- Offer Requests (Flight Search)
+- Offer Management
+- Order Creation (Planned)
 
 **Environment**:
-- **Test API**: Free tier, suitable for development
-- **Production API**: Paid tier, required for live deployment
+- **Test API**: robust sandbox environment
+- **Live API**: Production-ready booking system
 
 ## Development Tools
 
@@ -175,7 +176,7 @@ This document details the technology choices and architectural decisions for Sky
 - Instant feedback (no network latency)
 - Reduced API calls and costs
 - Better user experience
-- Amadeus API returns all results; filtering locally is efficient
+- API returns all results; filtering locally is efficient
 
 ## Performance Considerations
 

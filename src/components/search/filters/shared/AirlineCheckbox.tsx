@@ -24,7 +24,8 @@ export function AirlineCheckbox({ airlineCode, isSelected, onToggle, dictionarie
             />
             <span className="text-sm text-slate-400 group-hover:text-white transition truncate max-w-[180px]" title={airlineCode}>
                 {(() => {
-                    // Amadeus returns 'carriers', not 'airlines' in dictionaries. We check both just in case.
+                    // Check both 'carriers' (Amadeus legacy) and 'airlines' (Duffel/Standard) dictionaries
+
                     const entry = dictionaries?.carriers?.[airlineCode] || dictionaries?.airlines?.[airlineCode];
                     let name = entry || airlineCode;
 

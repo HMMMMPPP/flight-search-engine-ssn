@@ -21,7 +21,7 @@ export const amadeusService = {
                 children: params.children,
                 infants: params.infants,
                 travelClass: params.cabinClass ? params.cabinClass.toUpperCase() : 'ECONOMY',
-                currencyCode: params.currency,
+                // currencyCode: params.currency, // Try removing currency to avoid System Error 141 in Test Env
                 max: 50
             }));
 
@@ -29,10 +29,29 @@ export const amadeusService = {
             await logAPICall('amadeus', 'searchFlights', 'success', Date.now() - startTime);
 
             return response; // Return full response object to access dictionaries
-        } catch (error) {
+        } catch (error: any) {
             // Log failed API call
             await logAPICall('amadeus', 'searchFlights', 'error', Date.now() - startTime);
-            console.error('Amadeus Search Error:', error);
+
+            // DETAILED ERROR LOGGING
+            try {
+                console.error('--- AMADEUS ERROR DEBUG START ---');
+                console.error('Error keys:', Object.keys(error));
+                if (error.response) console.error('Response keys:', Object.keys(error.response));
+
+                console.error('Full Error JSON:', JSON.stringify(error, null, 2));
+
+                // Explicitly log header access if possible, or body
+                if (error.response) {
+                    console.error('Response Status:', error.response.statusCode);
+                    console.error('Response Body:', error.response.body);
+                }
+                console.error('--- AMADEUS ERROR DEBUG END ---');
+            } catch (loggingError) {
+                console.error('Failed to log error details:', loggingError);
+                console.error('Original Error:', error);
+            }
+
             return { data: [] }; // Return object with empty data
         }
     },
@@ -47,9 +66,16 @@ export const amadeusService = {
             }));
             await logAPICall('amadeus', 'getFlightInspiration', 'success', Date.now() - startTime);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             await logAPICall('amadeus', 'getFlightInspiration', 'error', Date.now() - startTime);
-            console.warn('Amadeus Inspiration Error:', error);
+            if (error.response) {
+                console.warn('Amadeus Inspiration API Error:', {
+                    status: error.response.statusCode,
+                    result: error.response.result
+                });
+            } else {
+                console.warn('Amadeus Inspiration Unexpected Error:', error);
+            }
             return [];
         }
     },
@@ -78,9 +104,16 @@ export const amadeusService = {
 
             await logAPICall('amadeus', 'getCheapestDates', 'success', Date.now() - startTime);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             await logAPICall('amadeus', 'getCheapestDates', 'error', Date.now() - startTime);
-            console.warn('Amadeus Cheapest Dates Error:', error);
+            if (error.response) {
+                console.warn('Amadeus CheapestDates API Error:', {
+                    status: error.response.statusCode,
+                    result: error.response.result
+                });
+            } else {
+                console.warn('Amadeus CheapestDates Unexpected Error:', error);
+            }
             return [];
         }
     },
@@ -143,9 +176,16 @@ export const amadeusService = {
             }));
             await logAPICall('amadeus', 'searchLocations', 'success', Date.now() - startTime);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             await logAPICall('amadeus', 'searchLocations', 'error', Date.now() - startTime);
-            console.warn('Amadeus Location Search Error:', error);
+            if (error.response) {
+                console.warn('Amadeus Locations API Error:', {
+                    status: error.response.statusCode,
+                    result: error.response.result
+                });
+            } else {
+                console.warn('Amadeus Locations Unexpected Error:', error);
+            }
             return [];
         }
     }

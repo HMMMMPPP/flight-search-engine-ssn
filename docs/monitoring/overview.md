@@ -105,34 +105,7 @@ SENTRY_AUTH_TOKEN=your_auth_token
 
 ### Tier 3: Performance Monitoring
 
-#### **Vercel Speed Insights** (Free for Netlify too!)
-**What**: Real User Monitoring (RUM) for Core Web Vitals
-
-**Setup**:
-```bash
-npm install @vercel/speed-insights
-```
-
-**Add to `layout.tsx`**:
-```typescript
-import { SpeedInsights } from "@vercel/speed-insights/next"
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <SpeedInsights />
-      </body>
-    </html>
-  )
-}
-```
-
-**Metrics Tracked**:
-- Largest Contentful Paint (LCP) - Target: < 2.5s
-- First Input Delay (FID) - Target: < 100ms
-- Cumulative Layout Shift (CLS) - Target: < 0.1
+> **Note**: Performance monitoring is currently handled via Sentry (configured in Tier 2).
 
 ---
 

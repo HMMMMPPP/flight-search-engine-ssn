@@ -74,7 +74,7 @@ export function TrendStrategist() {
                             <h3 className="text-lg font-bold text-white">Global Trend Strategist</h3>
                             <div className="flex items-center gap-2 text-xs text-slate-400">
                                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                Live Amadeus Data
+                                Live Duffel Data
                             </div>
                         </div>
                     </div>

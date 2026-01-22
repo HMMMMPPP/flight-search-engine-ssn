@@ -5,7 +5,7 @@
  * Logs are searchable in Netlify Functions logs using [API_CALL] prefix.
  */
 
-export type APIProvider = 'amadeus' | 'gemini' | 'groq';
+export type APIProvider = 'amadeus' | 'gemini' | 'groq' | 'duffel';
 export type APIStatus = 'success' | 'error';
 
 interface APICallLog {
